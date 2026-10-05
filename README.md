@@ -27,6 +27,32 @@ npm run preview       # serve the build at http://localhost:4173
 
 The same scripts also work directly inside `frontend/` (`npm install`, `npm run dev`, ...).
 
+## Deploy (Vercel)
+
+The site is a static build hosted on [Vercel](https://vercel.com). To set it up, import this repo once
+(**Add New → Project**) with these settings:
+
+| Setting          | Value           |
+| ---------------- | --------------- |
+| Root Directory   | `frontend`      |
+| Framework Preset | Vite            |
+| Build Command    | `npm run build` |
+| Output Directory | `dist`          |
+| Node.js Version  | 20.x or newer   |
+
+Then add the environment variable `VITE_MOD_PASSCODE` with your own passcode (**Settings → Environment Variables**).
+If it's unset, the passcode is `beacon`, which anyone can read in this README. Vite builds the value into the
+site's JavaScript, so you have to redeploy after changing it, and anyone who reads that JavaScript can still find it
+(see the security note below).
+
+After setup, each push to `main` deploys to production, and every other branch gets its own preview URL.
+`frontend/vercel.json` serves `index.html` for every route, so refreshing a deep link such as `/games/mlbb` loads the app
+instead of returning a 404.
+
+> **Shared features are not shared yet.** All data still lives in each visitor's own browser. Pages, guides and the
+> stream and playlist embeds work for everyone. But chat, squad posts, songs, votes and moderator changes stay on the
+> device where they were made. Sharing them needs the backend planned in `backend/` and `database/`.
+
 ## Pages
 
 | Route                     | Who        | Purpose                                                          |
