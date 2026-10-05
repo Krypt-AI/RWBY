@@ -50,8 +50,8 @@ What the database guarantees on its own:
 ## Set up a Supabase project
 
 1. **Create a project** at [supabase.com](https://supabase.com). The free tier is enough for a friends group.
-2. **Set your time zone** in `supabase/seed.sql` (e.g. `'Asia/Kuala_Lumpur'`), so the seeded game nights land on
-   local evenings rather than UTC ones.
+2. **Check the time zone** in `supabase/seed.sql`. It's `'Asia/Kuala_Lumpur'`, so the seeded game nights land on
+   Malaysian evenings. Change it if your group lives elsewhere.
 3. **Apply the migrations and seed.** With the [Supabase CLI](https://supabase.com/docs/guides/cli), from this folder:
 
    ```bash
@@ -63,6 +63,9 @@ What the database guarantees on its own:
 
    Without the CLI, paste each file from `supabase/migrations/` into the dashboard's **SQL Editor** in order, then
    `supabase/seed.sql`.
+
+   Seed only a new project: the seed replaces all shared content (chat, votes, squad posts) with the starter set.
+   For later schema changes, run `npx supabase db push` without `--include-seed`.
 4. **Turn on Discord sign-in.**
    1. In the [Discord Developer Portal](https://discord.com/developers/applications), create an application. Under
       **OAuth2**, add the redirect `https://<your-project-ref>.supabase.co/auth/v1/callback` and copy the client ID
