@@ -1,0 +1,146 @@
+/* ---------- Squad board ---------- */
+.squad-board {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.lfg-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.lfg-game {
+  color: var(--accent);
+}
+
+.lfg-rank {
+  color: var(--text-2);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.lfg-roles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lfg-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.lfg-meta {
+  color: var(--text-3);
+  font-size: var(--text-sm);
+}
+
+.lfg-meta b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.lfg-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---------- Music ---------- */
+.playlist-frame {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: 0;
+  background: var(--bg);
+}
+
+.track-list {
+  display: grid;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+.track:first-child {
+  border-top: 0;
+}
+
+.track-rank {
+  color: var(--text-3);
+  font-family: var(--font-label);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.track:first-child .track-rank {
+  color: var(--nora);
+}
+
+.track-info {
+  display: grid;
+  min-width: 0;
+}
+
+.track-info b {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.track-info a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.track-info a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.track-info small {
+  color: var(--text-3);
+  font-size: var(--text-sm);
+}
+
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--duration), border-color var(--duration);
+}
+
+.like-button:hover {
+  color: var(--text);
+  border-color: var(--text-3);
+}
+
+.like-button.is-on {
+  color: var(--nora);
+  border-color: var(--nora);
+}
+
+.like-button.is-on svg {
+  fill: currentColor;
+}

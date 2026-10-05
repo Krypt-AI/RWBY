@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+
+# Emitted by older tsconfig settings
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# Office lock files
+~$*

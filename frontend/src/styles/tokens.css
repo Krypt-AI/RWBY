@@ -1,0 +1,81 @@
+/* Design tokens: the RWBY palette on a near-black base. */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces: neutrals carry a faint violet tint (Blake) so black never looks flat. */
+  --bg: #0a0a0d;
+  --bg-raised: #101015;
+  --surface: #14141a;
+  --surface-2: #1b1b22;
+  --line: #292932;
+  --line-strong: #3a3a45;
+
+  --text: #f3f0ea;
+  --text-2: #bdbac4;
+  --text-3: #8f8c99;
+
+  /* Team colours */
+  --ruby: #e0293d;
+  --ruby-strong: #ff4458;
+  --ruby-deep: #3a0d14;
+  --weiss: #eaf1fb;
+  --weiss-ice: #9fc6ef;
+  --blake: #a895cc;
+  --blake-grey: #4a4853;
+  --yang: #f4c430;
+  --yang-deep: #2e2509;
+  /* Nora (team JNPR): the music accent. */
+  --nora: #ff7eb6;
+
+  --success: #6fcf97;
+  --accent: var(--ruby);
+
+  /* Type */
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-label: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.2rem + 1vw, 1.875rem);
+  --text-2xl: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+  --text-hero: clamp(2.25rem, 1.4rem + 2.8vw, 3.75rem);
+
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* Shape and motion */
+  --radius: 2px;
+  --notch: 16px;
+  --sidebar-width: 248px;
+  --topbar-height: 64px;
+  --tabbar-height: 64px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration: 180ms;
+}
+
+/* Category / section accents */
+.accent-ruby { --accent: var(--ruby); }
+.accent-weiss { --accent: var(--weiss-ice); }
+.accent-blake { --accent: var(--blake); }
+.accent-yang { --accent: var(--yang); }
+.accent-nora { --accent: var(--nora); }
+
+.tone-ruby { color: var(--ruby); }
+.tone-weiss { color: var(--weiss); }
+.tone-blake { color: var(--text-3); }
+.tone-yang { color: var(--yang); }
+
+.bg-ruby { background: var(--ruby); }
+.bg-weiss { background: var(--weiss); }
+.bg-blake { background: var(--blake-grey); }
+.bg-yang { background: var(--yang); }
