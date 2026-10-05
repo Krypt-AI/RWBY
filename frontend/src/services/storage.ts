@@ -2,8 +2,8 @@
  * Thin wrapper around localStorage. Storage can be unavailable (private mode,
  * blocked cookies), so every call fails soft and the app keeps working in memory.
  *
- * This is the seam to replace with a real backend (e.g. Supabase) later:
- * swap these functions for API calls and keep the hooks untouched.
+ * Holds the whole site in the local demo (see services/backend/local.ts). On the shared
+ * backend it only remembers per-tab preferences such as moderator mode.
  */
 const PREFIX = 'rwby.'
 

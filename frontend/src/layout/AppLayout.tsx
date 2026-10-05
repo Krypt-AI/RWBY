@@ -1,17 +1,32 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import type { AccountStatus } from '../lib/AccountContext'
+import { useAccount } from '../hooks/useAccount'
 import { useMode } from '../hooks/useMode'
 import { useSite } from '../hooks/useSite'
+import { AccountButton } from '../components/AccountButton'
 import { Icon } from '../components/Icon'
 import { ModeSwitch } from '../components/ModeSwitch'
+import { Notice } from '../components/Notice'
+import { SignInDialog } from '../components/SignInDialog'
+import { SiteStatusMessage } from '../components/SiteStatusMessage'
 import { StatusPill } from '../components/StatusPill'
 import { EmblemStripe, Wordmark } from '../components/Wordmark'
 import { AnnouncementBanner } from '../components/Announcement'
 import { NAV_ITEMS } from './navigation'
 
+/** The role under "Viewing as" in the sidebar. */
+function viewingAs(isModerator: boolean, status: AccountStatus): string {
+  if (isModerator) return 'Moderator'
+  if (status === 'local') return 'User'
+  return status === 'signedIn' ? 'Member' : 'Guest'
+}
+
 export function AppLayout() {
   const { isModerator } = useMode()
-  const { stream } = useSite().state
+  const { status: accountStatus } = useAccount()
+  const { state, status } = useSite()
+  const { stream } = state
   const { pathname } = useLocation()
   const items = NAV_ITEMS.filter(item => !item.moderatorOnly || isModerator)
 
@@ -52,8 +67,9 @@ export function AppLayout() {
 
         <div className="sidebar-foot">
           <p className="mode-label">
-            Viewing as <b>{isModerator ? 'Moderator' : 'User'}</b>
+            Viewing as <b>{viewingAs(isModerator, accountStatus)}</b>
           </p>
+          <AccountButton />
           <ModeSwitch />
         </div>
       </aside>
@@ -72,6 +88,7 @@ export function AppLayout() {
             )}
           </div>
           <div className="topbar-mode">
+            <AccountButton compact />
             <ModeSwitch compact />
           </div>
         </header>
@@ -79,9 +96,12 @@ export function AppLayout() {
         <AnnouncementBanner />
 
         <main id="main" className="content" tabIndex={-1}>
-          <Outlet />
+          {status === 'ready' ? <Outlet /> : <SiteStatusMessage status={status} />}
         </main>
       </div>
+
+      <Notice />
+      <SignInDialog />
 
       <nav className="tabbar" aria-label="Main">
         {items.map(item => (

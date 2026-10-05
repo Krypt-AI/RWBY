@@ -49,7 +49,10 @@ function roomWith(names: string[], startsAt: string | null): GameRoom {
   return { ...createRoom(), startsAt, members: names.map(name => ({ id: `seed-${name}`, name, joinedAt })) }
 }
 
-/** Initial content used on first visit and when a moderator resets the site. */
+/**
+ * Initial content for the local demo: used on first visit and when a moderator resets the site.
+ * The shared backend seeds the same content from database/supabase/migrations/…_seed_content.sql.
+ */
 export function createSeedState(): SiteState {
   return {
     announcement: {

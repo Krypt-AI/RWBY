@@ -75,7 +75,7 @@ export function TrackForm() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     if (!title.trim() || !artist.trim() || urlInvalid) return
-    add({ title: title.trim(), artist: artist.trim(), url: url.trim() })
+    if (!add({ title: title.trim(), artist: artist.trim(), url: url.trim() })) return
     setTitle('')
     setArtist('')
     setUrl('')

@@ -28,8 +28,9 @@ export function usePoll(category: Category) {
 
   const vote = (optionId: string) => {
     if (!poll.isOpen || optionId === votedFor) return
-    dispatch({ type: 'poll/vote', category, optionId, previousOptionId: votedFor })
-    recordBallot(category, { round: poll.round, optionId })
+    if (dispatch({ type: 'poll/vote', category, optionId, previousOptionId: votedFor })) {
+      recordBallot(category, { round: poll.round, optionId })
+    }
   }
 
   return { poll, votedFor, totalVotes, leader, vote }

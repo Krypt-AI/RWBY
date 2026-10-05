@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import type { LfgPost } from '../../lib/types'
 import { GAMES, GAME_BY_ID } from '../../data/games'
 import { useLfg } from '../../hooks/useLfg'
-import { useViewer } from '../../hooks/useViewer'
+import { ActingAs } from '../ActingAs'
 import { ChipGroup } from '../ChipGroup'
 import { Icon } from '../Icon'
 
@@ -19,7 +19,6 @@ function modesFor(game: GameChoice): string[] {
 /** Post a "looking for group" ad. Author is the viewer's chat name. */
 export function LfgForm() {
   const { publish } = useLfg()
-  const { name } = useViewer()
   const [game, setGame] = useState<GameChoice>(GAMES[0]?.id ?? 'other')
   const [mode, setMode] = useState(() => modesFor(game)[0] ?? '')
   const [rank, setRank] = useState('')
@@ -40,7 +39,7 @@ export function LfgForm() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    publish({ game, mode, rank: rank.trim(), roles, slots, note: note.trim() })
+    if (!publish({ game, mode, rank: rank.trim(), roles, slots, note: note.trim() })) return
     setRank('')
     setRoles([])
     setNote('')
@@ -117,7 +116,7 @@ export function LfgForm() {
           <Icon name="plus" size={16} /> Post squad
         </button>
         <p className="muted">
-          Posting as <b>{name}</b>
+          <ActingAs verb="Posting" />
         </p>
       </div>
     </form>

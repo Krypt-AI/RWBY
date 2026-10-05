@@ -1,11 +1,12 @@
 {
   "name": "rwby-afterlight-root",
   "private": true,
-  "description": "Convenience scripts that forward to the frontend app.",
+  "description": "Convenience scripts that forward to the frontend app and the backend tests.",
   "scripts": {
-    "install:all": "npm --prefix frontend install",
+    "install:all": "npm --prefix frontend install && npm --prefix backend install",
     "dev": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build",
-    "preview": "npm --prefix frontend run preview"
+    "preview": "npm --prefix frontend run preview",
+    "test": "npm --prefix backend test"
   }
 }

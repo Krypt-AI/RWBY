@@ -4,6 +4,7 @@ import { CATEGORIES, CATEGORY_META } from '../lib/categories'
 import { useSite } from '../hooks/useSite'
 import { useMode } from '../hooks/useMode'
 import { useViewer } from '../hooks/useViewer'
+import { createId } from '../utils/id'
 import { formatSessionDate } from '../utils/format'
 import { Icon } from './Icon'
 import { EmptyState } from './Panel'
@@ -78,7 +79,7 @@ export function ScheduleForm() {
     if (!title.trim() || !startsAt) return
     moderate({
       type: 'schedule/add',
-      session: { title: title.trim(), category, startsAt: new Date(startsAt).toISOString() },
+      session: { id: createId(), title: title.trim(), category, startsAt: new Date(startsAt).toISOString() },
     })
     setTitle('')
     setStartsAt('')

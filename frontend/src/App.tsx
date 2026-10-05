@@ -1,4 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { NoticeProvider } from './lib/NoticeContext'
+import { AccountProvider } from './lib/AccountContext'
 import { ModeProvider } from './lib/ModeContext'
 import { SiteProvider } from './lib/SiteContext'
 import { ViewerProvider } from './lib/ViewerContext'
@@ -17,9 +19,11 @@ import { NotFoundPage } from './pages/NotFoundPage'
 
 export default function App() {
   return (
-    <ModeProvider>
-      <SiteProvider>
-        <ViewerProvider>
+    <NoticeProvider>
+      <AccountProvider>
+        <ModeProvider>
+          <SiteProvider>
+            <ViewerProvider>
           <BrowserRouter basename={import.meta.env.BASE_URL}>
             <Routes>
               <Route element={<AppLayout />}>
@@ -43,8 +47,10 @@ export default function App() {
               </Route>
             </Routes>
           </BrowserRouter>
-        </ViewerProvider>
-      </SiteProvider>
-    </ModeProvider>
+            </ViewerProvider>
+          </SiteProvider>
+        </ModeProvider>
+      </AccountProvider>
+    </NoticeProvider>
   )
 }

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { Category } from '../lib/types'
 import { useSite } from '../hooks/useSite'
+import { createId } from '../utils/id'
 import { Icon } from './Icon'
 import { ModPanel } from './Panel'
 
@@ -13,7 +14,7 @@ export function PollEditor({ category }: { category: Category }) {
   const addOption = (event: FormEvent) => {
     event.preventDefault()
     if (!title.trim()) return
-    moderate({ type: 'poll/addOption', category, title: title.trim(), note: note.trim() })
+    moderate({ type: 'poll/addOption', category, id: createId(), title: title.trim(), note: note.trim() })
     setTitle('')
     setNote('')
   }

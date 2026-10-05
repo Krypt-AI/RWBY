@@ -1,19 +1,15 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react'
 import type { SiteState } from './types'
 import { siteReducer, type SiteAction } from './siteReducer'
-import { createSeedState } from './seed'
 import { ModeContext } from './ModeContext'
-import { load, save, subscribe } from '../services/storage'
+import { useAccount } from '../hooks/useAccount'
+import { useNotice } from '../hooks/useNotice'
+import { backend, type SiteStatus } from '../services/backend'
 
 /**
- * v2 added game/music polls, the LFG board and the music queue.
- * v3 added game rooms and swapped the anime and manga polls for the seasonal anime poll.
- */
-const STORAGE_KEY = 'site.v3'
-
-/**
- * Actions any visitor may perform. Everything else is moderator-only.
- * The UI only offers 'lfg/remove' on the viewer's own posts, and room edits to room members.
+ * Actions any signed-in visitor may perform. Everything else is moderator-only.
+ * The UI only offers 'lfg/remove' on the viewer's own posts, and room edits to room members;
+ * on the shared backend the server enforces both.
  */
 export type ViewerAction = Extract<
   SiteAction,
@@ -37,32 +33,49 @@ export type ViewerAction = Extract<
 
 type SiteContextValue = {
   state: SiteState
-  dispatch: (action: ViewerAction) => void
+  /** 'ready' once the data has loaded. Always ready in the local demo. */
+  status: SiteStatus
+  /** Returns false when the visitor has to sign in first (they are asked to). */
+  dispatch: (action: ViewerAction) => boolean
   /** No-op outside moderator mode. */
   moderate: (action: SiteAction) => void
 }
 
 export const SiteContext = createContext<SiteContextValue | null>(null)
 
+/**
+ * The community data. Every change applies right away (optimistically), then goes to the
+ * backend, which confirms it or, if it refuses, reloads the data and shows why.
+ */
 export function SiteProvider({ children }: { children: ReactNode }) {
-  const [state, rawDispatch] = useReducer(siteReducer, undefined, () => load(STORAGE_KEY, createSeedState))
+  const store = backend.site
+  const [state, apply] = useReducer(siteReducer, undefined, store.initialState)
+  const [status, setStatus] = useState<SiteStatus>(backend.kind === 'shared' ? 'loading' : 'ready')
   const isModerator = useContext(ModeContext)?.isModerator ?? false
+  const { requireAccount } = useAccount()
+  const { report } = useNotice()
 
-  useEffect(() => {
-    save(STORAGE_KEY, state)
-  }, [state])
-  useEffect(() => subscribe<SiteState>(STORAGE_KEY, next => rawDispatch({ type: 'site/hydrate', state: next })), [])
+  useEffect(() => store.connect({ update: update => apply({ type: 'site/update', update }), setStatus }), [store])
+  useEffect(() => store.persist?.(state), [store, state])
 
-  const value = useMemo<SiteContextValue>(
-    () => ({
+  const value = useMemo<SiteContextValue>(() => {
+    const run = (action: SiteAction) => {
+      apply(action)
+      store.send(action).catch(report)
+    }
+    return {
       state,
-      dispatch: rawDispatch,
-      moderate: action => {
-        if (isModerator) rawDispatch(action)
+      status,
+      dispatch: action => {
+        if (!requireAccount()) return false
+        run(action)
+        return true
       },
-    }),
-    [state, isModerator],
-  )
+      moderate: action => {
+        if (isModerator) run(action)
+      },
+    }
+  }, [store, state, status, isModerator, requireAccount, report])
 
   return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>
 }

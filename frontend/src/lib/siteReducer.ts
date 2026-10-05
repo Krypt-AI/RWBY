@@ -22,29 +22,33 @@ const MAX_CHAT_MESSAGES = 200
 const MAX_LFG_POSTS = 50
 const MAX_TRACKS = 100
 
+/** Applies data loaded from storage or the backend to the current state. */
+export type SiteUpdate = (state: SiteState) => SiteState
+
+/** Actions that create something carry the new id, so the backend can store it under the same id. */
 export type SiteAction =
-  | { type: 'site/hydrate'; state: SiteState }
+  | { type: 'site/update'; update: SiteUpdate }
   | { type: 'site/reset' }
   | { type: 'announcement/update'; patch: Partial<Announcement> }
   | { type: 'stream/update'; patch: Partial<Stream> }
-  | { type: 'schedule/add'; session: Omit<Session, 'id'> }
+  | { type: 'schedule/add'; session: Session }
   | { type: 'schedule/remove'; id: string }
-  | { type: 'chat/send'; author: string; text: string; fromModerator: boolean }
+  | { type: 'chat/send'; id: string; author: string; text: string; fromModerator: boolean }
   | { type: 'chat/remove'; id: string }
   | { type: 'chat/togglePin'; id: string }
   | { type: 'chat/clear' }
   | { type: 'poll/vote'; category: Category; optionId: string; previousOptionId?: string }
   | { type: 'poll/update'; category: Category; patch: Partial<Pick<Poll, 'title' | 'isOpen'>> }
-  | { type: 'poll/addOption'; category: Category; title: string; note: string }
+  | { type: 'poll/addOption'; category: Category; id: string; title: string; note: string }
   | { type: 'poll/removeOption'; category: Category; optionId: string }
   | { type: 'poll/resetVotes'; category: Category }
   | { type: 'anime/startSeason'; season: AnimeSeason; title: string; shows: { title: string; note: string }[] }
-  | { type: 'lfg/post'; post: Omit<LfgPost, 'id' | 'joined' | 'at'> }
+  | { type: 'lfg/post'; post: Omit<LfgPost, 'joined' | 'at'> }
   | { type: 'lfg/join'; id: string; joining: boolean }
   | { type: 'lfg/remove'; id: string }
   | { type: 'lfg/clear' }
   | { type: 'music/update'; patch: Partial<Pick<Music, 'playlistUrl'>> }
-  | { type: 'track/add'; track: Omit<Track, 'id' | 'likes' | 'at'> }
+  | { type: 'track/add'; track: Omit<Track, 'likes' | 'at'> }
   | { type: 'track/like'; id: string; liking: boolean }
   | { type: 'track/remove'; id: string }
   | { type: 'room/join'; game: GameId; member: Omit<RoomMember, 'joinedAt'> }
@@ -69,8 +73,8 @@ function updateRoom(state: SiteState, game: GameId, update: (room: GameRoom) => 
 
 export function siteReducer(state: SiteState, action: SiteAction): SiteState {
   switch (action.type) {
-    case 'site/hydrate':
-      return action.state
+    case 'site/update':
+      return action.update(state)
     case 'site/reset':
       return createSeedState()
 
@@ -80,7 +84,7 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
       return { ...state, stream: { ...state.stream, ...action.patch } }
 
     case 'schedule/add': {
-      const schedule = [...state.schedule, { ...action.session, id: createId() }]
+      const schedule = [...state.schedule, action.session]
       schedule.sort((a, b) => a.startsAt.localeCompare(b.startsAt))
       return { ...state, schedule }
     }
@@ -89,7 +93,7 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
 
     case 'chat/send': {
       const message = {
-        id: createId(),
+        id: action.id,
         author: action.author,
         text: action.text,
         at: new Date().toISOString(),
@@ -129,7 +133,7 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
     case 'poll/addOption':
       return updatePoll(state, action.category, poll => ({
         ...poll,
-        options: [...poll.options, { id: createId(), title: action.title, note: action.note, votes: 0 }],
+        options: [...poll.options, { id: action.id, title: action.title, note: action.note, votes: 0 }],
       }))
     case 'poll/removeOption':
       return updatePoll(state, action.category, poll => ({
@@ -152,7 +156,7 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
       }))
 
     case 'lfg/post': {
-      const post = { ...action.post, id: createId(), joined: 0, at: new Date().toISOString() }
+      const post = { ...action.post, joined: 0, at: new Date().toISOString() }
       return { ...state, lfg: [post, ...state.lfg].slice(0, MAX_LFG_POSTS) }
     }
     case 'lfg/join':
@@ -170,7 +174,7 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
     case 'music/update':
       return { ...state, music: { ...state.music, ...action.patch } }
     case 'track/add': {
-      const track = { ...action.track, id: createId(), likes: 0, at: new Date().toISOString() }
+      const track = { ...action.track, likes: 0, at: new Date().toISOString() }
       return { ...state, music: { ...state.music, queue: [...state.music.queue, track].slice(-MAX_TRACKS) } }
     }
     case 'track/like':
