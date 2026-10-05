@@ -1,4 +1,4 @@
-type Tone = 'live' | 'open' | 'closed' | 'offline'
+export type Tone = 'live' | 'open' | 'closed' | 'offline'
 
 const LABELS: Record<Tone, string> = { live: 'Live', open: 'Voting open', closed: 'Voting closed', offline: 'Offline' }
 

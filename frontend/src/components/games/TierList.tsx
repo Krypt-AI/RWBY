@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { GameGuide, Tier, TierEntry } from '../../data/games/types'
+import type { GameGuide, LiveRates, Tier, TierEntry } from '../../data/games/types'
 import { roleName } from '../../data/games'
 import { ChipGroup } from '../ChipGroup'
 import { Icon } from '../Icon'
@@ -18,12 +18,18 @@ const TIERS: Tier[] = ['S', 'A', 'B', 'C', 'D', 'F']
 
 const ALL_ROLES = 'all'
 
+type TierListProps = {
+  game: GameGuide
+  /** Live rates by name. They replace the snapshot rates; tier placements stay curated. */
+  rates?: Map<string, LiveRates>
+}
 
 /** Tier list grouped by tier and filterable by role. Shows only the metrics this game publishes. */
-export function TierList({ game }: { game: GameGuide }) {
+export function TierList({ game, rates }: TierListProps) {
   const [roleId, setRoleId] = useState(ALL_ROLES)
-  const metrics = METRICS.filter(metric => game.tiers.some(entry => entry[metric.key] !== undefined))
-  const entries = roleId === ALL_ROLES ? game.tiers : game.tiers.filter(entry => entry.roleId === roleId)
+  const tiers = rates ? game.tiers.map(entry => ({ ...entry, ...rates.get(entry.name) })) : game.tiers
+  const metrics = METRICS.filter(metric => tiers.some(entry => entry[metric.key] !== undefined))
+  const entries = roleId === ALL_ROLES ? tiers : tiers.filter(entry => entry.roleId === roleId)
   const roleOptions = [
     { value: ALL_ROLES, label: 'All' },
     ...game.roles.map(role => ({ value: role.id, label: role.name })),
@@ -38,6 +44,7 @@ export function TierList({ game }: { game: GameGuide }) {
             Tier list
           </h2>
         </div>
+        {rates && <span className="live-chip">Live rates</span>}
       </div>
 
       <ChipGroup

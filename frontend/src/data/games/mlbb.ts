@@ -1,9 +1,11 @@
 import type { GameGuide } from './types'
+import { MLBB_HEROES } from './mlbbHeroes'
 
 /**
  * Snapshot: Season 42, patch 2.2.16 (taken 2026-10-05).
  * Tiers merge mlbb.io and mlbbhub.com; rates are ranked, all servers.
- * Rates are left out where the sources don't publish them.
+ * Rates are left out where the sources don't publish them. While the live feed
+ * (services/liveStats.ts) is up, the page shows live rates instead.
  */
 export const MLBB: GameGuide = {
   id: 'mlbb',
@@ -17,8 +19,8 @@ export const MLBB: GameGuide = {
 
   stats: [
     { label: 'Patch', value: '2.2.16', note: 'Season 42 · Starward Decade' },
-    { label: 'Highest win rate', value: 'Rafaela 59.4%', note: 'Roam support, ranked on all servers' },
-    { label: 'Most banned', value: 'Hirara 65.8%', note: 'Banned in about two of every three drafts' },
+    { label: 'Highest win rate', value: 'Rafaela 59.4%', note: 'Roam support, ranked on all servers', live: 'winRate' },
+    { label: 'Most banned', value: 'Hirara 65.8%', note: 'Banned in about two of every three drafts', live: 'banRate' },
     { label: 'Biggest riser', value: 'Aulus +7.7', note: 'Win-rate points gained this patch' },
   ],
 
@@ -315,4 +317,34 @@ export const MLBB: GameGuide = {
     { label: 'mlbb.io hero tier', url: 'https://mlbb.io/en/hero-tier' },
     { label: 'mlbbhub.com hero builds', url: 'https://mlbbhub.com/heroes/hirara' },
   ],
+  liveLinks: [
+    { label: 'Official hero rankings', url: 'https://www.mobilelegends.com/rank' },
+    { label: 'mlbb.io hero tier', url: 'https://mlbb.io/en/hero-tier' },
+  ],
+
+  draft: {
+    heroes: MLBB_HEROES,
+    healers: [
+      'Estes',
+      'Rafaela',
+      'Floryn',
+      'Angela',
+      'Minotaur',
+      'Alucard',
+      'Ruby',
+      'Yu Zhong',
+      'Uranus',
+      'Thamuz',
+      'Fredrinn',
+      'Ixia',
+      'Hilda',
+    ],
+    answers: {
+      healing: ['Dominance Ice', 'Sea Halberd', 'Necklace of Durance'],
+      dive: ['Winter Crown', 'Wind of Nature'],
+      magic: ['Athena’s Shield', 'Radiant Armor'],
+      physical: ['Antique Cuirass', 'Blade Armor'],
+      control: ['Tough Boots', 'Purify (spell)'],
+    },
+  },
 }

@@ -1,6 +1,6 @@
 import type { Stream } from '../lib/types'
 import { toEmbedUrl } from '../utils/embed'
-import offlinePoster from '../assets/images/Ruby_moon.jpg'
+import offlinePoster from '../assets/images/RubyRose.jpg'
 
 export function StreamPlayer({ stream }: { stream: Stream }) {
   const embedUrl = stream.isLive ? toEmbedUrl(stream.url) : null

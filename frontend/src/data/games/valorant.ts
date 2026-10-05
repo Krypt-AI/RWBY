@@ -321,4 +321,9 @@ export const VALORANT: GameGuide = {
     { label: 'Patch notes 13.06', url: 'https://wiki.playvalorant.com/en-us/Patch_Notes/13.06' },
     { label: 'Economy guide (13.06)', url: 'https://turbosmurfs.gg/article/valorant-economy-guide' },
   ],
+  liveLinks: [
+    { label: 'metabot.gg win rates', url: 'https://metabot.gg/en/valorant/agents/win-rate' },
+    { label: 'Blitz.gg agent stats', url: 'https://blitz.gg/valorant/stats/agents' },
+    { label: 'vstats.gg tier list', url: 'https://www.vstats.gg/' },
+  ],
 }

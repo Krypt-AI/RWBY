@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { GameGuide } from '../../data/games/types'
+import { LIVE_FEEDS } from '../../services/liveStats'
 import { formatDate } from '../../utils/format'
 import { Icon } from '../Icon'
 
@@ -14,7 +15,7 @@ export function GameCard({ game }: { game: GameGuide }) {
       <span className="game-card-label">{game.genre}</span>
       <b className="game-card-title">{game.name}</b>
       <span className="game-card-patch">
-        Patch {game.patch} · updated {formatDate(game.asOf)}
+        Patch {game.patch} · {LIVE_FEEDS[game.id] ? 'rates update live' : `updated ${formatDate(game.asOf)}`}
       </span>
       <p className="game-card-tagline">{game.tagline}</p>
       <span className="game-card-picks">

@@ -4,6 +4,7 @@ import { ScheduleList } from '../components/ScheduleList'
 import { VoteSummaryCard } from '../components/VoteSummaryCard'
 import { PlaylistPlayer, PlaylistSettings } from '../components/music/PlaylistPlayer'
 import { TrackForm, TrackQueue } from '../components/music/TrackQueue'
+import weissArt from '../assets/images/Weiss.jpg'
 
 export function MusicPage() {
   return (
@@ -12,6 +13,7 @@ export function MusicPage() {
         eyebrow="Music"
         title="Turn it up"
         lead="The squad playlist, everyone’s current favourites and the song of the week."
+        art={{ src: weissArt, position: 'center top' }}
       />
 
       <div className="split-layout is-wide-main">

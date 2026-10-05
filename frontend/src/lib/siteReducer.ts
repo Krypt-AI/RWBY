@@ -1,5 +1,21 @@
-import type { Announcement, Category, LfgPost, Music, Poll, Session, SiteState, Stream, Track } from './types'
+import type {
+  AnimeSeason,
+  Announcement,
+  Category,
+  GameId,
+  GameRoom,
+  LfgPost,
+  Music,
+  Poll,
+  RoomMember,
+  Session,
+  SiteState,
+  Stream,
+  Track,
+} from './types'
 import { createSeedState } from './seed'
+import { SEASONAL_CATEGORY } from './categories'
+import { createRoom, ENEMY_PICK_LIMIT, ROOM_SIZE } from './rooms'
 import { createId } from '../utils/id'
 
 const MAX_CHAT_MESSAGES = 200
@@ -22,6 +38,7 @@ export type SiteAction =
   | { type: 'poll/addOption'; category: Category; title: string; note: string }
   | { type: 'poll/removeOption'; category: Category; optionId: string }
   | { type: 'poll/resetVotes'; category: Category }
+  | { type: 'anime/startSeason'; season: AnimeSeason; title: string; shows: { title: string; note: string }[] }
   | { type: 'lfg/post'; post: Omit<LfgPost, 'id' | 'joined' | 'at'> }
   | { type: 'lfg/join'; id: string; joining: boolean }
   | { type: 'lfg/remove'; id: string }
@@ -30,6 +47,13 @@ export type SiteAction =
   | { type: 'track/add'; track: Omit<Track, 'id' | 'likes' | 'at'> }
   | { type: 'track/like'; id: string; liking: boolean }
   | { type: 'track/remove'; id: string }
+  | { type: 'room/join'; game: GameId; member: Omit<RoomMember, 'joinedAt'> }
+  | { type: 'room/leave'; game: GameId; memberId: string }
+  | { type: 'room/setStart'; game: GameId; startsAt: string | null }
+  | { type: 'room/pickEnemy'; game: GameId; hero: string }
+  | { type: 'room/unpickEnemy'; game: GameId; hero: string }
+  | { type: 'room/clearPicks'; game: GameId }
+  | { type: 'room/reset'; game: GameId }
 
 function step(value: number, up: boolean): number {
   return up ? value + 1 : Math.max(0, value - 1)
@@ -37,6 +61,10 @@ function step(value: number, up: boolean): number {
 
 function updatePoll(state: SiteState, category: Category, update: (poll: Poll) => Poll): SiteState {
   return { ...state, polls: { ...state.polls, [category]: update(state.polls[category]) } }
+}
+
+function updateRoom(state: SiteState, game: GameId, update: (room: GameRoom) => GameRoom): SiteState {
+  return { ...state, rooms: { ...state.rooms, [game]: update(state.rooms[game]) } }
 }
 
 export function siteReducer(state: SiteState, action: SiteAction): SiteState {
@@ -114,6 +142,14 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
         round: poll.round + 1,
         options: poll.options.map(option => ({ ...option, votes: 0 })),
       }))
+    case 'anime/startSeason':
+      return updatePoll(state, SEASONAL_CATEGORY, poll => ({
+        title: action.title,
+        isOpen: true,
+        round: poll.round + 1,
+        season: action.season,
+        options: action.shows.map(show => ({ id: createId(), title: show.title, note: show.note, votes: 0 })),
+      }))
 
     case 'lfg/post': {
       const post = { ...action.post, id: createId(), joined: 0, at: new Date().toISOString() }
@@ -149,5 +185,33 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
       }
     case 'track/remove':
       return { ...state, music: { ...state.music, queue: state.music.queue.filter(track => track.id !== action.id) } }
+
+    case 'room/join':
+      return updateRoom(state, action.game, room => {
+        const inRoom = room.members.some(member => member.id === action.member.id)
+        if (inRoom || room.members.length >= ROOM_SIZE) return room
+        return { ...room, members: [...room.members, { ...action.member, joinedAt: new Date().toISOString() }] }
+      })
+    case 'room/leave':
+      return updateRoom(state, action.game, room => ({
+        ...room,
+        members: room.members.filter(member => member.id !== action.memberId),
+      }))
+    case 'room/setStart':
+      return updateRoom(state, action.game, room => ({ ...room, startsAt: action.startsAt }))
+    case 'room/pickEnemy':
+      return updateRoom(state, action.game, room => {
+        if (room.enemyPicks.includes(action.hero) || room.enemyPicks.length >= ENEMY_PICK_LIMIT) return room
+        return { ...room, enemyPicks: [...room.enemyPicks, action.hero] }
+      })
+    case 'room/unpickEnemy':
+      return updateRoom(state, action.game, room => ({
+        ...room,
+        enemyPicks: room.enemyPicks.filter(hero => hero !== action.hero),
+      }))
+    case 'room/clearPicks':
+      return updateRoom(state, action.game, room => ({ ...room, enemyPicks: [] }))
+    case 'room/reset':
+      return updateRoom(state, action.game, () => createRoom())
   }
 }

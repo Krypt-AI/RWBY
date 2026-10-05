@@ -6,6 +6,8 @@ import { Panel } from '../components/Panel'
 import { ScheduleList } from '../components/ScheduleList'
 import { VoteSummaryCard } from '../components/VoteSummaryCard'
 import { GameCard } from '../components/games/GameCard'
+import { RoomCard } from '../components/rooms/RoomCard'
+import blakeArt from '../assets/images/Blake.jpg'
 
 export function GamesPage() {
   return (
@@ -13,7 +15,8 @@ export function GamesPage() {
       <PageHeader
         eyebrow="Game guides"
         title="Know the meta"
-        lead="Tier lists, lineups, builds and roles for the games we actually queue. Each guide is a dated snapshot of the current patch."
+        lead="Tier lists, lineups, builds and roles for the games we actually queue. MLBB rates update live; every guide is dated to its patch."
+        art={{ src: blakeArt, position: 'center 35%' }}
         actions={
           <Link to="/squad" className="btn btn-primary">
             <Icon name="users" size={16} /> Find a squad
@@ -26,6 +29,19 @@ export function GamesPage() {
           <GameCard key={game.id} game={game} />
         ))}
       </div>
+
+      <section aria-labelledby="games-rooms">
+        <div className="section-head">
+          <h2 id="games-rooms" className="section-title">
+            Game rooms
+          </h2>
+        </div>
+        <div className="room-cards">
+          {GAMES.map(game => (
+            <RoomCard key={game.id} game={game} />
+          ))}
+        </div>
+      </section>
 
       <div className="split-layout">
         <Panel eyebrow="Schedule" title="Game nights">

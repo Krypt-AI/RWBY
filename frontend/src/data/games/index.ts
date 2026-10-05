@@ -12,6 +12,7 @@ export const GAME_SECTIONS: { id: GameSection; label: string }[] = [
   { id: 'lineups', label: 'Lineups' },
   { id: 'builds', label: 'Builds & gear' },
   { id: 'roles', label: 'Roles' },
+  { id: 'room', label: 'Game room' },
 ]
 
 export function isGameId(value: string | undefined): value is GameId {

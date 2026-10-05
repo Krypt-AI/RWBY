@@ -39,7 +39,7 @@ export function HomePage() {
             <em>Turn it up.</em>
           </h1>
           <p className="lead">
-            Game nights, ranked pushes, a shared playlist and the occasional watch-along. The group votes and we queue.
+            Game nights, ranked pushes, a shared playlist and the anime of the season. The group votes and we queue.
           </p>
           <div className="hero-actions">
             <Link to="/squad" className="btn btn-primary">

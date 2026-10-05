@@ -3,10 +3,15 @@ export type Mode = 'user' | 'moderator'
 /** Team colours used as section accents (see tokens.css). */
 export type Accent = 'ruby' | 'weiss' | 'blake' | 'yang' | 'nora'
 
-export type Category = 'game' | 'music' | 'anime' | 'manga' | 'movie'
+export type Category = 'game' | 'music' | 'anime' | 'movie'
 
 /** Games with a meta guide under /games. */
 export type GameId = 'mlbb' | 'valorant'
+
+export type SeasonName = 'winter' | 'spring' | 'summer' | 'fall'
+
+/** An anime broadcast season, e.g. Fall 2026. */
+export type AnimeSeason = { year: number; name: SeasonName }
 
 export type PollOption = {
   id: string
@@ -21,6 +26,8 @@ export type Poll = {
   /** Bumped whenever votes are reset so stale ballots are ignored. */
   round: number
   options: PollOption[]
+  /** The season the options air in. Only the seasonal anime poll has one. */
+  season?: AnimeSeason
 }
 
 export type Session = {
@@ -84,6 +91,22 @@ export type Music = {
   queue: Track[]
 }
 
+export type RoomMember = {
+  /** The viewer id of the person who joined. */
+  id: string
+  name: string
+  joinedAt: string
+}
+
+/** The lobby for one game: who's in, when the squad starts and the enemy draft. */
+export type GameRoom = {
+  members: RoomMember[]
+  /** Planned start time, or null until a member sets one. */
+  startsAt: string | null
+  /** Enemy heroes entered in the counter-pick helper, in pick order. */
+  enemyPicks: string[]
+}
+
 export type SiteState = {
   announcement: Announcement
   stream: Stream
@@ -92,6 +115,7 @@ export type SiteState = {
   polls: Record<Category, Poll>
   lfg: LfgPost[]
   music: Music
+  rooms: Record<GameId, GameRoom>
 }
 
 /** Per-browser data that never leaves the viewer's device. */

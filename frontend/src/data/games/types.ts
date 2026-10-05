@@ -4,7 +4,7 @@ import type { Accent, GameId } from '../../lib/types'
  * Shape of a game guide. Each game is a static snapshot of the meta at one
  * patch; update the data file (and `asOf`) when a new patch lands.
  */
-export type GameSection = 'meta' | 'lineups' | 'builds' | 'roles'
+export type GameSection = 'meta' | 'lineups' | 'builds' | 'roles' | 'room'
 
 export type SourceLink = { label: string; url: string }
 
@@ -60,7 +60,50 @@ export type EquipmentItem = { name: string; cost?: string; detail: string }
 
 export type EquipmentGroup = { title: string; items: EquipmentItem[] }
 
-export type GameStat = { label: string; value: string; note: string }
+/** A rate the live feed publishes for every hero or agent. */
+export type LiveRate = 'winRate' | 'pickRate' | 'banRate'
+
+/** Live percentages for one hero or agent. */
+export type LiveRates = Record<LiveRate, number>
+
+/** How picking a hero against an enemy moves win rate, in percentage points. */
+export type MatchupStat = { heroId: number; delta: number }
+
+export type GameStat = {
+  label: string
+  value: string
+  note: string
+  /** Shows the live leader for this rate instead of `value` while the live feed is up. */
+  live?: LiveRate
+}
+
+export type HeroClass = 'tank' | 'fighter' | 'assassin' | 'mage' | 'marksman' | 'support'
+
+/** One hero in a draft, with the game's official counter relations. */
+export type DraftHero = {
+  id: number
+  name: string
+  portrait: string
+  /** GameRole ids the hero is played in. */
+  lanes: string[]
+  classes: HeroClass[]
+  /** Ids of heroes this one is strong against. */
+  counters: number[]
+  /** Ids of heroes that are strong against this one. */
+  counteredBy: number[]
+}
+
+/** Something in the enemy draft that a build should answer. */
+export type Threat = 'healing' | 'magic' | 'physical' | 'dive' | 'control'
+
+/** What the game-room counter helper needs for one game. */
+export type DraftKit = {
+  heroes: DraftHero[]
+  /** Heroes whose healing or lifesteal calls for anti-heal. */
+  healers: string[]
+  /** Items that answer each threat. */
+  answers: Record<Threat, string[]>
+}
 
 export type GameGuide = {
   id: GameId
@@ -88,4 +131,8 @@ export type GameGuide = {
   /** Placeholder for the rank field on the Squad board. */
   rankExample: string
   sources: SourceLink[]
+  /** Stat pages that update continuously, for checking numbers between snapshots. */
+  liveLinks: SourceLink[]
+  /** Hero pool for the counter-pick helper in the game room. Games without one skip the helper. */
+  draft?: DraftKit
 }

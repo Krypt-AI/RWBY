@@ -8,16 +8,23 @@ type CategoryMeta = {
   blurb: string
 }
 
-export const CATEGORIES: Category[] = ['game', 'music', 'anime', 'manga', 'movie']
+export const CATEGORIES: Category[] = ['game', 'music', 'anime', 'movie']
 
 /** Where /votes lands. */
 export const DEFAULT_CATEGORY: Category = 'game'
 
+/** The poll whose options come from the current anime season (see services/seasonalAnime.ts). */
+export const SEASONAL_CATEGORY: Category = 'anime'
+
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
   game: { label: 'Game', plural: 'Games', accent: 'blake', blurb: 'Pick what the squad plays on the next game night.' },
   music: { label: 'Music', plural: 'Music', accent: 'nora', blurb: 'Crown the song of the week for the shared playlist.' },
-  anime: { label: 'Anime', plural: 'Anime', accent: 'ruby', blurb: 'Pick the next series we watch together on stream.' },
-  manga: { label: 'Manga', plural: 'Manga', accent: 'weiss', blurb: 'Choose the next read for the book-club nights.' },
+  anime: {
+    label: 'Anime',
+    plural: 'Seasonal anime',
+    accent: 'ruby',
+    blurb: 'Crown the best show airing this season. The lineup changes with every anime season.',
+  },
   movie: { label: 'Movie', plural: 'Movies', accent: 'yang', blurb: 'Vote for the feature film on movie night.' },
 }
 

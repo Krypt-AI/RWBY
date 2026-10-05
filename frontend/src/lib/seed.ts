@@ -1,4 +1,7 @@
-import type { LfgPost, Poll, SiteState, Track } from './types'
+import type { GameRoom, LfgPost, Poll, SiteState, Track } from './types'
+import { CURATED_LINEUPS } from '../data/anime/lineups'
+import { seasonalPollTitle } from './animeSeasons'
+import { createRoom } from './rooms'
 import { createId } from '../utils/id'
 
 function poll(title: string, options: [string, string][]): Poll {
@@ -8,6 +11,14 @@ function poll(title: string, options: [string, string][]): Poll {
     round: 1,
     options: options.map(([optionTitle, note]) => ({ id: createId(), title: optionTitle, note, votes: 0 })),
   }
+}
+
+/** The seasonal anime poll, drawn from the newest curated lineup. */
+function seasonalPoll(): Poll {
+  const [latest] = CURATED_LINEUPS
+  if (!latest) return poll('Anime of the season', [])
+  const options = latest.shows.map((show): [string, string] => [show.title, show.note])
+  return { ...poll(seasonalPollTitle(latest.season), options), season: latest.season }
 }
 
 function track(title: string, artist: string): Track {
@@ -26,11 +37,23 @@ function daysFromNow(days: number, hour: number): string {
   return date.toISOString()
 }
 
+/** Two hours out, on the next quarter hour. */
+function soon(): string {
+  const date = new Date(Date.now() + 2 * 3_600_000)
+  date.setMinutes(Math.ceil(date.getMinutes() / 15) * 15, 0, 0)
+  return date.toISOString()
+}
+
+function roomWith(names: string[], startsAt: string | null): GameRoom {
+  const joinedAt = new Date().toISOString()
+  return { ...createRoom(), startsAt, members: names.map(name => ({ id: `seed-${name}`, name, joinedAt })) }
+}
+
 /** Initial content used on first visit and when a moderator resets the site. */
 export function createSeedState(): SiteState {
   return {
     announcement: {
-      text: 'Welcome to Beacon. MLBB Season 42 and Valorant 13.06 guides are up, and game-night voting is open.',
+      text: 'Welcome to Beacon. MLBB stats are live, the game rooms are open and the Fall 2026 anime vote has started.',
       visible: true,
     },
     stream: {
@@ -43,7 +66,6 @@ export function createSeedState(): SiteState {
       { id: createId(), title: 'MLBB 5-stack customs', category: 'game', startsAt: daysFromNow(1, 21) },
       { id: createId(), title: 'Listening party', category: 'music', startsAt: daysFromNow(2, 20) },
       { id: createId(), title: 'Valorant ranked push', category: 'game', startsAt: daysFromNow(3, 21) },
-      { id: createId(), title: 'Anime night', category: 'anime', startsAt: daysFromNow(4, 20) },
       { id: createId(), title: 'Movie night', category: 'movie', startsAt: daysFromNow(6, 21) },
     ],
     chat: [],
@@ -60,17 +82,7 @@ export function createSeedState(): SiteState {
         ['Legends Never Die', 'Against The Current'],
         ['RISE', 'The Glitch Mob, Mako & The Word Alive'],
       ]),
-      anime: poll('Next anime watch-along', [
-        ['Frieren: Beyond Journey’s End', 'Fantasy · 28 episodes'],
-        ['Mob Psycho 100', 'Action · 37 episodes'],
-        ['Dandadan', 'Supernatural · 24 episodes'],
-        ['Spy x Family', 'Comedy · 37 episodes'],
-      ]),
-      manga: poll('Next book-club read', [
-        ['Vagabond', 'Seinen · Takehiko Inoue'],
-        ['Chainsaw Man', 'Shōnen · Tatsuki Fujimoto'],
-        ['Witch Hat Atelier', 'Fantasy · Kamome Shirahama'],
-      ]),
+      anime: seasonalPoll(),
       movie: poll('Movie night pick', [
         ['Spirited Away', 'Studio Ghibli · 2001'],
         ['Your Name', 'CoMix Wave · 2016'],
@@ -111,6 +123,10 @@ export function createSeedState(): SiteState {
         track('Paint the Town Blue', 'Ashnikko'),
         track('Phoenix', 'Cailin Russo & Chrissy Costanza'),
       ],
+    },
+    rooms: {
+      mlbb: roomWith(['Weiss', 'Blake'], soon()),
+      valorant: createRoom(),
     },
   }
 }

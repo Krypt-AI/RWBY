@@ -1,19 +1,20 @@
 import { Navigate, NavLink, useParams } from 'react-router-dom'
-import type { Accent } from '../lib/types'
-import { CATEGORIES, CATEGORY_META, DEFAULT_CATEGORY, isCategory } from '../lib/categories'
+import type { Category } from '../lib/types'
+import { CATEGORIES, CATEGORY_META, DEFAULT_CATEGORY, SEASONAL_CATEGORY, isCategory } from '../lib/categories'
 import { useSite } from '../hooks/useSite'
 import { useActiveTabInView } from '../hooks/useActiveTabInView'
 import { PageHeader } from '../components/PageHeader'
 import { PollBoard } from '../components/PollBoard'
 import { PollEditor } from '../components/PollEditor'
+import { SeasonCard } from '../components/anime/SeasonCard'
+import { SeasonControls } from '../components/anime/SeasonControls'
 import teamBands from '../assets/images/RWBY2.jpg'
 
 /**
- * RWBY2.jpg stacks four team bands (Ruby, Weiss, Blake, Yang) vertically.
- * Each category shows its matching band via background-position; accents
- * without a band (Nora) skip the art.
+ * RWBY2.jpg stacks four team bands (Ruby, Weiss, Blake, Yang) vertically; each category
+ * shows one via background-position. Weiss gets music because she's the team's singer.
  */
-const BAND_POSITION: Partial<Record<Accent, string>> = { ruby: '0%', weiss: '33.333%', blake: '66.667%', yang: '100%' }
+const BAND_POSITION: Record<Category, string> = { anime: '0%', music: '33.333%', game: '66.667%', movie: '100%' }
 
 export function VotesPage() {
   const { category } = useParams()
@@ -23,7 +24,7 @@ export function VotesPage() {
   if (!isCategory(category)) return <Navigate to={`/votes/${DEFAULT_CATEGORY}`} replace />
 
   const meta = CATEGORY_META[category]
-  const bandPosition = BAND_POSITION[meta.accent]
+  const isSeasonal = category === SEASONAL_CATEGORY
 
   return (
     <div className="page">
@@ -45,15 +46,15 @@ export function VotesPage() {
       <div className="votes-layout">
         <PollBoard category={category} />
         <aside className="votes-side">
-          {bandPosition && (
-            <div
-              className={`band-card accent-${meta.accent}`}
-              style={{ backgroundImage: `url(${teamBands})`, backgroundPositionY: bandPosition }}
-              role="img"
-              aria-label={`${meta.label} emblem art`}
-            />
-          )}
+          <div
+            className={`band-card accent-${meta.accent}`}
+            style={{ backgroundImage: `url(${teamBands})`, backgroundPositionY: BAND_POSITION[category] }}
+            role="img"
+            aria-label={`${meta.label} emblem art`}
+          />
           <p className="votes-blurb">{meta.blurb}</p>
+          {isSeasonal && <SeasonCard />}
+          {isSeasonal && <SeasonControls />}
           <PollEditor category={category} />
         </aside>
       </div>

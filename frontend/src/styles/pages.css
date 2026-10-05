@@ -334,6 +334,43 @@
   color: var(--text-2);
 }
 
+/* ---------- Seasonal anime ---------- */
+.season-progress {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.season-progress b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.season-facts {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+
+.season-facts div {
+  display: grid;
+  gap: 2px;
+}
+
+.season-facts dt {
+  color: var(--text-3);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.season-facts dd {
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
 .poll-foot {
   padding-top: var(--space-2);
 }
@@ -396,11 +433,11 @@
   --accent: var(--ruby);
 }
 
-.poll-table {
+.control-table {
   display: grid;
 }
 
-.poll-table li {
+.control-table li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto auto auto;
   align-items: center;
@@ -410,12 +447,12 @@
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.poll-table-name {
+.control-table-name {
   display: grid;
   min-width: 0;
 }
 
-.poll-table-name small {
+.control-table-name small {
   color: var(--accent);
   font-family: var(--font-label);
   font-size: var(--text-xs);
@@ -424,7 +461,7 @@
   text-transform: uppercase;
 }
 
-.poll-table-count {
+.control-table-count {
   color: var(--text-3);
   font-size: var(--text-sm);
 }
@@ -438,11 +475,11 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .poll-table li {
+  .control-table li {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .poll-table-count {
+  .control-table-count {
     grid-column: 1 / -1;
     grid-row: 2;
   }

@@ -88,7 +88,7 @@ export function ScheduleForm() {
     <form className="form-grid" onSubmit={submit}>
       <label className="field">
         <span>Session title</span>
-        <input value={title} onChange={event => setTitle(event.target.value)} placeholder="Anime night" required />
+        <input value={title} onChange={event => setTitle(event.target.value)} placeholder="Game night" required />
       </label>
       <label className="field">
         <span>Type</span>

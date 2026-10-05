@@ -46,3 +46,28 @@ const dateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: '
 
 /** Formats a plain YYYY-MM-DD date without shifting it across time zones. */
 export const formatDate = (isoDate: string) => dateFormat.format(new Date(`${isoDate}T12:00:00`))
+
+const pad = (value: number) => String(value).padStart(2, '0')
+
+/** "12:09", "1:02:09" or "2d 03:12:09". */
+export function formatCountdown(ms: number): string {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000))
+  const days = Math.floor(totalSeconds / 86_400)
+  const hours = Math.floor(totalSeconds / 3_600) % 24
+  const minutes = Math.floor(totalSeconds / 60) % 60
+  const seconds = totalSeconds % 60
+  if (days > 0) return `${days}d ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  if (hours > 0) return `${hours}:${pad(minutes)}:${pad(seconds)}`
+  return `${minutes}:${pad(seconds)}`
+}
+
+/** The value a datetime-local input expects, in the viewer's time zone. */
+export function toLocalInputValue(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+/** "Estes, Rafaela and Floryn" */
+export function formatList(items: string[]): string {
+  if (items.length < 2) return items.join('')
+  return `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+}

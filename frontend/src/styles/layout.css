@@ -12,6 +12,7 @@
 .sidebar {
   position: sticky;
   top: 0;
+  isolation: isolate;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,6 +20,20 @@
   padding: var(--space-6) var(--space-4) var(--space-5);
   background: var(--bg-raised);
   border-right: 1px solid var(--line);
+}
+
+/* The four team emblems rise faintly behind the lower nav. */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: min(72%, 600px);
+  background: url('../assets/images/RW.jpg') center 70% / cover no-repeat;
+  opacity: 0.13;
+  mask-image: linear-gradient(transparent, #000 60%);
+  -webkit-mask-image: linear-gradient(transparent, #000 60%);
+  pointer-events: none;
 }
 
 .sidebar-brand {

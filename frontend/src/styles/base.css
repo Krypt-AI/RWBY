@@ -6,6 +6,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--line-strong) var(--bg);
 }
 
 body {
@@ -53,6 +54,11 @@ select,
 textarea {
   font: inherit;
   color: inherit;
+}
+
+input,
+textarea {
+  caret-color: var(--yang);
 }
 
 button {

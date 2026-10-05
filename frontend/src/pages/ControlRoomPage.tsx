@@ -1,16 +1,28 @@
 import { Link } from 'react-router-dom'
 import { CATEGORIES, CATEGORY_META } from '../lib/categories'
+import { ROOM_SIZE, roomPhase, type RoomPhase } from '../lib/rooms'
+import { GAMES } from '../data/games'
 import { useSite } from '../hooks/useSite'
+import { formatSessionDate } from '../utils/format'
 import { Icon } from '../components/Icon'
 import { PageHeader } from '../components/PageHeader'
 import { Panel } from '../components/Panel'
-import { StatusPill } from '../components/StatusPill'
+import { StatusPill, type Tone } from '../components/StatusPill'
 import { AnnouncementEditor } from '../components/Announcement'
 import { ScheduleForm, ScheduleList } from '../components/ScheduleList'
+import moonArt from '../assets/images/Ruby_moon.jpg'
+
+const ROOM_PILL: Record<RoomPhase, { tone: Tone; label: string }> = {
+  unscheduled: { tone: 'offline', label: 'No time set' },
+  ended: { tone: 'offline', label: 'No time set' },
+  upcoming: { tone: 'open', label: 'Scheduled' },
+  starting: { tone: 'open', label: 'Starting' },
+  inGame: { tone: 'live', label: 'In game' },
+}
 
 export function ControlRoomPage() {
   const { state, moderate } = useSite()
-  const { stream, polls, chat, schedule } = state
+  const { stream, polls, chat, schedule, rooms } = state
 
   const totalVotes = CATEGORIES.reduce(
     (sum, category) => sum + polls[category].options.reduce((acc, option) => acc + option.votes, 0),
@@ -18,9 +30,8 @@ export function ControlRoomPage() {
   )
 
   const resetSite = () => {
-    if (window.confirm('Reset all polls, chat, schedule, squad posts, songs and stream settings to the defaults?')) {
-      moderate({ type: 'site/reset' })
-    }
+    const message = 'Reset all polls, chat, schedule, squad posts, songs, game rooms and stream settings to the defaults?'
+    if (window.confirm(message)) moderate({ type: 'site/reset' })
   }
 
   return (
@@ -29,6 +40,7 @@ export function ControlRoomPage() {
         eyebrow="Moderator"
         title="Control room"
         lead="Everything users see, in one place. Changes go live immediately for every open tab."
+        art={{ src: moonArt, position: 'center 30%' }}
       />
 
       <dl className="stat-row">
@@ -75,17 +87,17 @@ export function ControlRoomPage() {
         </Panel>
 
         <Panel eyebrow="Votes" title="Polls" className="span-2">
-          <ul className="poll-table">
+          <ul className="control-table">
             {CATEGORIES.map(category => {
               const poll = polls[category]
               const votes = poll.options.reduce((sum, option) => sum + option.votes, 0)
               return (
                 <li key={category} className={`accent-${CATEGORY_META[category].accent}`}>
-                  <span className="poll-table-name">
+                  <span className="control-table-name">
                     <small>{CATEGORY_META[category].label}</small>
                     <b>{poll.title}</b>
                   </span>
-                  <span className="poll-table-count">
+                  <span className="control-table-count">
                     {votes} votes · {poll.options.length} options
                   </span>
                   <StatusPill tone={poll.isOpen ? 'open' : 'closed'} />
@@ -105,6 +117,37 @@ export function ControlRoomPage() {
           </ul>
         </Panel>
 
+        <Panel eyebrow="Rooms" title="Game rooms" className="span-2">
+          <ul className="control-table">
+            {GAMES.map(game => {
+              const room = rooms[game.id]
+              const pill = ROOM_PILL[roomPhase(room.startsAt, Date.now())]
+              return (
+                <li key={game.id} className={`accent-${game.accent}`}>
+                  <span className="control-table-name">
+                    <small>{game.shortName}</small>
+                    <b>{room.startsAt ? formatSessionDate(room.startsAt) : 'No start time'}</b>
+                  </span>
+                  <span className="control-table-count">
+                    {room.members.length}/{ROOM_SIZE} in the room · {room.enemyPicks.length} enemy picks
+                  </span>
+                  <StatusPill tone={pill.tone} label={pill.label} />
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-small"
+                    onClick={() => moderate({ type: 'room/reset', game: game.id })}
+                  >
+                    Reset
+                  </button>
+                  <Link to={`/games/${game.id}/room`} className="link-arrow">
+                    Open <Icon name="arrow" size={14} />
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </Panel>
+
         <Panel eyebrow="Schedule" title="Sessions" className="span-2">
           <ScheduleForm />
           <ScheduleList />
@@ -112,7 +155,9 @@ export function ControlRoomPage() {
 
         <Panel eyebrow="Danger zone" title="Reset the site" className="span-2 danger">
           <div className="mod-row">
-            <p className="muted">Restores the default polls, schedule, squad board, song queue and stream, and clears the chat.</p>
+            <p className="muted">
+              Restores the default polls, schedule, squad board, song queue, game rooms and stream, and clears the chat.
+            </p>
             <button type="button" className="btn btn-danger" onClick={resetSite}>
               <Icon name="refresh" size={16} /> Reset everything
             </button>
