@@ -3,6 +3,17 @@
 A fan-run, RWBY-themed friends community: game meta guides (MLBB, Valorant), a squad finder,
 a shared music playlist, live watch-alongs and community votes.
 
+## Project structure
+
+```
+RWBY/
+  frontend/     React + Vite app (everything that runs today)
+  backend/      planned API: not built yet, see backend/README.md
+  database/     planned schema: not built yet, see database/README.md
+  docs/         project documentation
+  package.json  root shortcuts that forward to frontend/
+```
+
 ## Run it
 
 From the `RWBY/` folder (shortcuts forward to `frontend/`):
@@ -43,8 +54,8 @@ The passcode comes from `VITE_MOD_PASSCODE` (see `frontend/.env.example`) and de
 Mode is stored per tab, so you can open a user tab and a moderator tab side by side and watch changes sync.
 
 > **Security note:** the passcode and all data live in the browser (`localStorage`). This is a demo gate,
-> not access control. For real moderators, replace `src/services/storage.ts` with a backend
-> (e.g. Supabase with auth roles and row-level security).
+> not access control. For real moderators, replace `frontend/src/services/storage.ts` with a backend
+> (e.g. Supabase with auth roles and row-level security). The plan is in `backend/` and `database/`.
 
 ## Updating the game guides
 
