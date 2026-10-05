@@ -139,6 +139,22 @@
   text-shadow: 0 2px 24px rgb(10 10 13 / 0.7);
 }
 
+/* The art also settles into the panel along the bottom, so every header reads as one
+   family whatever the source image, and header actions sit on dark instead of on the art. */
+.page-header.has-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    0deg,
+    var(--bg-raised) 2%,
+    color-mix(in srgb, var(--bg-raised) 55%, transparent) 30%,
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
 @media (max-width: 720px) {
   .page-header.has-art {
     min-height: 0;

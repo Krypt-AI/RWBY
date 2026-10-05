@@ -7,7 +7,7 @@ import { ScheduleList } from '../components/ScheduleList'
 import { VoteSummaryCard } from '../components/VoteSummaryCard'
 import { GameCard } from '../components/games/GameCard'
 import { RoomCard } from '../components/rooms/RoomCard'
-import blakeArt from '../assets/images/Blake.jpg'
+import rubyArt from '../assets/images/RubyRose.jpg'
 
 export function GamesPage() {
   return (
@@ -16,7 +16,7 @@ export function GamesPage() {
         eyebrow="Game guides"
         title="Know the meta"
         lead="Tier lists, lineups, builds and roles for the games we actually queue. MLBB rates update live; every guide is dated to its patch."
-        art={{ src: blakeArt, position: 'center 35%' }}
+        art={{ src: rubyArt, position: 'center 30%' }}
         actions={
           <Link to="/squad" className="btn btn-primary">
             <Icon name="users" size={16} /> Find a squad
