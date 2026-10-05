@@ -45,7 +45,6 @@ export function useGameRoom(game: GameId) {
   return {
     room,
     viewerId: viewer.id,
-    viewerName: viewer.name,
     isMember,
     isFull,
     canEdit,

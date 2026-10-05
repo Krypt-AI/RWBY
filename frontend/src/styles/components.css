@@ -445,6 +445,109 @@
   }
 }
 
+/* ---------- Account (shared backend only) ---------- */
+/* Signed out it is the shell's one call to action; signed in it is the member's name tag. */
+.account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--ruby);
+  background: var(--ruby);
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color var(--duration), border-color var(--duration), background var(--duration);
+}
+
+.account-button:hover:not(:disabled) {
+  background: var(--ruby-strong);
+  border-color: var(--ruby-strong);
+}
+
+.account-button:disabled {
+  opacity: 0.45;
+}
+
+.account-button.is-signed-in {
+  justify-content: flex-start;
+  padding-left: var(--space-2);
+  border-color: var(--line-strong);
+  background: none;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.account-button.is-signed-in:hover {
+  border-color: var(--text-3);
+  background: var(--surface);
+}
+
+.account-button.is-signed-in span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-button .avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 0.625rem;
+}
+
+img.avatar {
+  object-fit: cover;
+}
+
+@media (max-width: 520px) {
+  .account-button.is-compact {
+    width: 40px;
+    padding: 0;
+  }
+
+  .account-button.is-compact span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .account-button.is-compact.is-signed-in {
+    justify-content: center;
+  }
+}
+
+.account-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.account-summary .avatar {
+  width: 44px;
+  height: 44px;
+  font-size: var(--text-sm);
+}
+
+.account-summary p {
+  display: grid;
+}
+
+.account-summary small {
+  color: var(--text-3);
+  font-size: var(--text-sm);
+}
+
 .dialog {
   width: min(440px, calc(100vw - 2rem));
   padding: var(--space-5);
@@ -458,7 +561,8 @@
   background: rgb(0 0 0 / 0.72);
 }
 
-.dialog form {
+.dialog form,
+.dialog-body {
   display: grid;
   gap: var(--space-4);
 }
@@ -1104,4 +1208,101 @@ fieldset.field {
 .fine-print {
   color: var(--text-3);
   font-size: var(--text-xs);
+}
+
+/* ---------- Notice (a change the server refused) ---------- */
+.notice-region {
+  position: fixed;
+  inset: auto 0 var(--space-5) var(--sidebar-width);
+  z-index: 60;
+  display: grid;
+  justify-items: center;
+  padding: 0 var(--space-4);
+  pointer-events: none;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(100%, 30rem);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-top: 2px solid var(--ruby);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.55);
+  font-size: var(--text-sm);
+  pointer-events: auto;
+  animation: notice-in 280ms var(--ease-out);
+}
+
+.notice > svg {
+  flex-shrink: 0;
+  color: var(--ruby-strong);
+}
+
+.notice span {
+  flex: 1;
+}
+
+@keyframes notice-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (max-width: 960px) {
+  .notice-region {
+    inset: auto 0 calc(var(--tabbar-height) + var(--space-4));
+  }
+}
+
+/* ---------- Site status (shared data loading or unreachable) ---------- */
+.site-status {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  min-height: 46vh;
+  text-align: center;
+}
+
+.site-status-stripe {
+  width: 112px;
+  height: 4px;
+  gap: 3px;
+}
+
+/* The team colours wake one after another, R to Y, while the data loads. */
+.site-status-stripe i {
+  opacity: 0.22;
+  animation: stripe-wake 1.4s var(--ease-out) infinite;
+}
+
+.site-status-stripe i:nth-child(2) { animation-delay: 0.14s; }
+.site-status-stripe i:nth-child(3) { animation-delay: 0.28s; }
+.site-status-stripe i:nth-child(4) { animation-delay: 0.42s; }
+
+@keyframes stripe-wake {
+  0%,
+  100% { opacity: 0.22; }
+  28% { opacity: 1; }
+}
+
+.site-status.is-unreachable .site-status-stripe i {
+  animation: none;
+  opacity: 0.35;
+}
+
+.site-status-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.site-status .muted {
+  max-width: 34ch;
 }

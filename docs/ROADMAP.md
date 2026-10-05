@@ -3,19 +3,20 @@
 How RWBY Afterlight gets from a single-browser demo to a shared community site. Stages run in order. Each one says
 what "done" means and which decisions it needs first.
 
-## Where things stand (2026-10-05)
+## Where things stand (2026-10-06)
 
 - Built and working locally: game guides with live MLBB stats, game rooms with a start-time countdown and an MLBB
   counter-pick helper, the seasonal anime poll, the squad board, music, the live stream page and votes.
-- Not shipped: `main` is one commit ahead of GitHub (the Vercel setup), and the 2026-10-05 features are committed on
-  the `feat/live-stats-rooms-anime` branch but not merged or pushed.
-- All community data (chat, squads, songs, votes, game rooms, moderator changes) lives in each visitor's browser, so
-  nothing is shared between people yet.
-- No automated tests, lint or CI.
+- Built: the shared backend (Stage 2). The Supabase schema, security, API functions, realtime and seed live in
+  `database/`, with 35 backend tests in `backend/`. The site uses it once `VITE_SUPABASE_URL` and
+  `VITE_SUPABASE_PUBLISHABLE_KEY` are set, and runs as the local demo, with data in the browser, without them.
+- Not live yet: the Supabase project still has to be created ([database/README.md](../database/README.md)), and the
+  Vercel import (1c) is still to do. `main` matches GitHub, with the 2026-10-05 features merged.
+- No frontend unit tests, lint or CI yet.
 
 ## Stage 1: Ship what's built (small)
 
-- [ ] **1a.** Commit the 2026-10-05 features on a feature branch, review them, then merge to `main`.
+- [x] **1a.** Commit the 2026-10-05 features on a feature branch, review them, then merge to `main`.
 - [ ] **1b.** Clean up the abandoned GitHub Pages attempt: delete the untracked `.github/workflows/deploy.yml` (never
   commit it) and decide whether to keep the no-op `basename` in [App.tsx](../frontend/src/App.tsx).
 - [ ] **1c.** Push `main`, import the repo into Vercel and set `VITE_MOD_PASSCODE` (see "Deploy (Vercel)" in the
@@ -29,24 +30,24 @@ what "done" means and which decisions it needs first.
 
 ## Stage 2: Shared backend (large)
 
-**Decision first:** approve Supabase (recommended) and choose a sign-in method.
+**Decided 2026-10-06:** Supabase, with Discord sign-in.
 
-- [ ] **2a. Safety net first:** Vitest tests for the reducer, counter scoring, room phases and season maths; ESLint
-  and Prettier; optionally CI on pull requests.
-- [ ] **2b.** Supabase project, schema and row-level security from [database/README.md](../database/README.md),
-  including the room tables: 5 seats, 5 picks and one vote per user per poll.
-- [ ] **2c.** Real sign-in, with a moderator role replacing the passcode. Discord suits a gaming group; a magic link
-  is the alternative.
-- [ ] **2d.** Save one change at a time instead of the whole site state, behind the existing hooks (`usePoll`,
-  `useLfg`, `useGameRoom`…) so pages barely change. The database computes vote, like and join counts.
-- [ ] **2e.** Live updates for chat, votes, squad joins and rooms (seats, start time, enemy picks), plus a "who's in
-  the room" indicator.
-- [ ] **2f.** Seed the database from [seed.ts](../frontend/src/lib/seed.ts), stop storing site data in the browser,
-  and fix the docs that call `storage.ts` the only swap point (the "Swap point" section of
-  [backend/README.md](../backend/README.md) and two notes in the root README).
+- [ ] **2a. Safety net:** the backend tests are done (35 in `backend/`, on the real migrations). Still to do: Vitest
+  tests for the reducer, counter scoring, room phases and season maths; ESLint and Prettier; optionally CI on pull
+  requests.
+- [x] **2b.** Schema and row-level security in [database/](../database/README.md), including the room tables: 5 seats,
+  5 picks and one vote per user per poll. Only the hosted Supabase project itself remains to be created.
+- [x] **2c.** Discord sign-in, with a moderator role replacing the passcode on the shared backend.
+- [x] **2d.** One API call per change instead of saving the whole site state, behind the existing hooks, so pages
+  barely changed. The database computes vote, like and join counts.
+- [ ] **2e.** Live updates for chat, votes, squad joins and rooms (seats, start time, enemy picks) are done. Still to
+  do: a "who's in the room" indicator (Supabase Presence).
+- [x] **2f.** The database seeds the starter content, site data stays out of the browser on the shared backend, and
+  the backend docs are rewritten ([backend/README.md](../backend/README.md)).
 
 **Done when:** two friends on different devices see the same room, draft, chat and votes live, and the server
-enforces moderator rules.
+enforces moderator rules. The server rules are covered by the backend tests. The two-device check waits for the
+hosted project.
 
 ## Stage 3: Data integrations (medium)
 
@@ -88,7 +89,6 @@ enforces moderator rules.
 In the order they block work:
 
 1. The GitHub Pages leftovers (1b).
-2. Supabase and the sign-in method (Stage 2).
-3. GitHub workflows for CI and the snapshot refresh (2a, 3d).
-4. Vercel functions for the two proxies (3a, 3c).
-5. The Valorant data source (3e).
+2. GitHub workflows for CI and the snapshot refresh (2a, 3d).
+3. Vercel functions for the two proxies (3a, 3c).
+4. The Valorant data source (3e).

@@ -118,11 +118,22 @@ export type SiteState = {
   rooms: Record<GameId, GameRoom>
 }
 
-/** Per-browser data that never leaves the viewer's device. */
+/** A signed-in member. Only exists when the site runs on the shared backend. */
+export type Account = {
+  id: string
+  name: string
+  avatarUrl: string | null
+  isModerator: boolean
+}
+
 export type Ballot = { round: number; optionId: string }
 
+/**
+ * The current visitor and their own choices. Saved in this browser when the site runs
+ * locally; loaded from their account on the shared backend.
+ */
 export type ViewerState = {
-  /** Random per-browser id, used to recognise your own posts. */
+  /** Account id on the shared backend, or a random per-browser id locally. Empty when signed out. */
   id: string
   name: string
   ballots: Partial<Record<Category, Ballot>>

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import type { Track } from '../lib/types'
+import { createId } from '../utils/id'
 import { useSite } from './useSite'
 import { useViewer } from './useViewer'
 
@@ -17,12 +18,12 @@ export function useTracks() {
   const isLiked = (track: Track) => viewer.likedTracks.includes(track.id)
 
   const toggleLike = (track: Track) => {
-    dispatch({ type: 'track/like', id: track.id, liking: !isLiked(track) })
-    viewer.toggleLikedTrack(track.id)
+    if (dispatch({ type: 'track/like', id: track.id, liking: !isLiked(track) })) viewer.toggleLikedTrack(track.id)
   }
 
+  /** Returns false when the visitor has to sign in first. */
   const add = (track: Pick<Track, 'title' | 'artist' | 'url'>) =>
-    dispatch({ type: 'track/add', track: { ...track, addedBy: viewer.name } })
+    dispatch({ type: 'track/add', track: { ...track, id: createId(), addedBy: viewer.name } })
 
   return { tracks: ranked, isLiked, toggleLike, add }
 }

@@ -1,11 +1,12 @@
 import type { GameRoomControls } from '../../hooks/useGameRoom'
 import { ROOM_SIZE } from '../../lib/rooms'
 import { initials } from '../../utils/format'
+import { ActingAs } from '../ActingAs'
 import { Icon } from '../Icon'
 
 /** Five seats: who's in, who's missing, and the viewer's join or leave button. */
 export function RoomRoster({ controls }: { controls: GameRoomControls }) {
-  const { room, viewerId, viewerName, isMember, isFull, join, leave } = controls
+  const { room, viewerId, isMember, isFull, join, leave } = controls
   const seats = Array.from({ length: ROOM_SIZE }, (_, index) => room.members[index])
 
   return (
@@ -43,7 +44,7 @@ export function RoomRoster({ controls }: { controls: GameRoomControls }) {
         )}
         {!isMember && !isFull && (
           <p className="muted">
-            Joining as <b>{viewerName}</b>
+            <ActingAs verb="Joining" />
           </p>
         )}
       </div>

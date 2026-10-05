@@ -8,25 +8,31 @@ community votes, including a seasonal anime poll.
 
 ```
 RWBY/
-  frontend/     React + Vite app (everything that runs today)
-  backend/      planned API: not built yet, see backend/README.md
-  database/     planned schema: not built yet, see database/README.md
+  frontend/     React + Vite app
+  backend/      API reference and tests for the Supabase backend, see backend/README.md
+  database/     Supabase schema, security, API functions and seed, see database/README.md
   docs/         project documentation
-  package.json  root shortcuts that forward to frontend/
+  package.json  root shortcuts that forward to frontend/ and backend/
 ```
 
 ## Run it
 
-From the `RWBY/` folder (shortcuts forward to `frontend/`):
+From the `RWBY/` folder (shortcuts forward to `frontend/` and `backend/`):
 
 ```bash
 npm run install:all   # first time only
 npm run dev           # http://localhost:5173
 npm run build         # type-check + production build to frontend/dist/
 npm run preview       # serve the build at http://localhost:4173
+npm test              # backend tests: the real migrations on an in-process Postgres
 ```
 
-The same scripts also work directly inside `frontend/` (`npm install`, `npm run dev`, ...).
+The same scripts also work directly inside `frontend/` and `backend/` (`npm install`, `npm run dev`, ...).
+
+Without Supabase settings the site runs as a **local demo**: everything works, but data stays in your browser and
+moderator mode uses a passcode. To share data between people, connect a Supabase project (see
+[database/README.md](database/README.md#set-up-a-supabase-project)) and put its settings in `frontend/.env.local`
+(copy `frontend/.env.example`).
 
 ## Deploy (Vercel)
 
@@ -41,19 +47,32 @@ The site is a static build hosted on [Vercel](https://vercel.com). To set it up,
 | Output Directory | `dist`          |
 | Node.js Version  | 20.x or newer   |
 
-Then add the environment variable `VITE_MOD_PASSCODE` with your own passcode (**Settings → Environment Variables**).
-If it's unset, the passcode is `beacon`, which anyone can read in this README. Vite builds the value into the
-site's JavaScript, so you have to redeploy after changing it, and anyone who reads that JavaScript can still find it
-(see the security note below).
+Then add the environment variables (**Settings → Environment Variables**):
+
+| Variable | Value |
+| --- | --- |
+| `VITE_SUPABASE_URL` | The project URL (Supabase dashboard, **Project Settings**) |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | The project's publishable key, from **Project Settings → API Keys** (the legacy anon key also works) |
+
+Both are safe to ship to the browser: row-level security and the API functions decide what anyone can do. Vite builds
+them into the site's JavaScript, so redeploy after changing them. Add your Vercel address to Supabase's redirect URLs
+too (step 4 in [database/README.md](database/README.md#set-up-a-supabase-project)), or Discord sign-in can't return to
+the site.
+
+Without them, the deployed site runs as the local demo. Its passcode then comes from `VITE_MOD_PASSCODE` and defaults
+to `beacon`, which anyone can read in this README.
 
 After setup, each push to `main` deploys to production, and every other branch gets its own preview URL.
 `frontend/vercel.json` serves `index.html` for every route, so refreshing a deep link such as `/games/mlbb` loads the app
 instead of returning a 404.
 
-> **Shared features are not shared yet.** All data still lives in each visitor's own browser. Pages, guides, live MLBB
-> stats and the stream and playlist embeds work for everyone. But chat, squad posts, songs, votes, game rooms (seats,
-> start times, enemy picks) and moderator changes stay on the device where they were made. Sharing them needs the
-> backend planned in `backend/` and `database/`.
+## Shared data
+
+With Supabase connected, everyone sees the same site, live: chat, votes, squad posts and joins, songs and likes, RSVPs,
+game rooms (seats, start times, enemy picks) and every moderator change. Reading needs no account. Taking part asks
+for a Discord sign-in. Each change shows at once for the person who made it and reaches everyone else through
+Supabase Realtime. If the server refuses one (say the room filled up a moment earlier), the site says why and puts
+things back. How it works, and what each role may do: [backend/README.md](backend/README.md).
 
 ## Pages
 
@@ -68,24 +87,26 @@ instead of returning a 404.
 | `/votes/:category`        | Everyone   | `game`, `music`, `anime` (seasonal) or `movie` poll              |
 | `/control`                | Moderators | Control room: stream, banner, polls, game rooms, schedule, reset |
 
-## User vs moderator mode
+## Members and moderators
 
-- **User** (default): watch, chat, vote (one vote per poll, changeable while open), RSVP,
+- **Visitors** can read everything. Trying to take part opens a "sign in with Discord" prompt.
+- **Members** (signed in): chat, vote (one vote per poll, changeable while open), RSVP,
   post and join squads (and close your own posts), add and like songs, and join a game room (five seats).
   Room members set the start time and enter the enemy picks for the MLBB counter helper.
-- **Moderator**: everything a user can do, plus gold-marked controls on each page.
+  Your Discord name is your display name; change it from the account button in the sidebar.
+- **Moderators**: everything a member can do, plus gold-marked controls on each page.
   Moderators can go live or end the stream, set the YouTube/Twitch link, pin or delete chat messages,
   open, close or reset polls, add or remove options, load the current anime season's lineup, edit the schedule
   and the banner, set the shared playlist, remove any squad post or song, clear the squad board, run or reset
   any game room, and reset the site.
 
-Use **Moderator login** in the sidebar (or the lock icon on mobile).
-The passcode comes from `VITE_MOD_PASSCODE` (see `frontend/.env.example`) and defaults to `beacon`.
-Mode is stored per tab, so you can open a user tab and a moderator tab side by side and watch changes sync.
+Moderators are members whose profile has the moderator role ([how to grant it](database/README.md#set-up-a-supabase-project)).
+They switch the gold controls on with **Moderator mode** in the sidebar (or the lock icon on mobile). The mode is
+stored per tab, so a moderator can keep a normal tab and a moderator tab side by side. The server checks the role on
+every moderator action, so the button only changes the view.
 
-> **Security note:** the passcode and all data live in the browser (`localStorage`). This is a demo gate,
-> not access control. For real moderators, replace `frontend/src/services/storage.ts` with a backend
-> (e.g. Supabase with auth roles and row-level security). The plan is in `backend/` and `database/`.
+In the local demo there are no accounts: **Moderator login** asks for the `VITE_MOD_PASSCODE` passcode (default
+`beacon`). That passcode ships in the site's JavaScript, so it's a demo gate, not access control.
 
 ## Live stats
 
@@ -135,6 +156,8 @@ Both were taken on 2026-10-05. When a patch lands, edit the tiers, lineups, buil
 and update `sources`. Leave out any rate the sources don't publish, and the tier list shows a dash.
 To add a game, create a new file with the `GameGuide` shape (`data/games/types.ts`), add its id to `GameId`
 in `lib/types.ts`, give it a room in the seed (`lib/seed.ts`), and register it in `data/games/index.ts`.
+For the shared backend, add a migration that extends the `game_id` type, allows it in `lfg_posts.game` and inserts
+its `game_rooms` row, and add the room to `private.seed_site()`.
 The hub, routes and squad board pick it up automatically. A `draft` kit adds the counter helper to its room.
 
 ## Frontend layout
@@ -153,10 +176,11 @@ frontend/src/
     music/           playlist embed and song queue
   data/games/        game guide snapshots (one file per game) and the MLBB hero snapshot
   data/anime/        curated seasonal lineups
-  hooks/             useSite, useMode, useViewer, usePoll, useLfg, useTracks, useGameRoom,
-                     useLiveStats, useMatchups, useSeasonalPoll, useNow
+  hooks/             useSite, useMode, useViewer, useAccount, useNotice, usePoll, useLfg, useTracks,
+                     useGameRoom, useLiveStats, useMatchups, useSeasonalPoll, useNow
   lib/               types, seed data, reducer, context providers, rooms, seasons, counter-pick scoring
-  services/          persistence (localStorage, the swap point for a backend), live stats feeds, anime lineup source
+  services/backend/  data access: the Supabase backend, or the local demo (see backend/README.md)
+  services/          also browser storage, live stats feeds, anime lineup source
   utils/             formatting, ids, caching, YouTube/Twitch embed parsing
   styles/            tokens, base, layout, components, pages, games, rooms, community
   assets/images/     RWBY artwork

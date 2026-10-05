@@ -2,7 +2,9 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useSite } from '../hooks/useSite'
 import { useMode } from '../hooks/useMode'
 import { useViewer } from '../hooks/useViewer'
+import { createId } from '../utils/id'
 import { formatTime, initials } from '../utils/format'
+import { ActingAs } from './ActingAs'
 import { Icon } from './Icon'
 import { EmptyState } from './Panel'
 
@@ -27,8 +29,7 @@ export function ChatPanel() {
     event.preventDefault()
     const text = draft.trim()
     if (!text) return
-    dispatch({ type: 'chat/send', author: name, text, fromModerator: isModerator })
-    setDraft('')
+    if (dispatch({ type: 'chat/send', id: createId(), author: name, text, fromModerator: isModerator })) setDraft('')
   }
 
   const saveName = (event: FormEvent<HTMLFormElement>) => {
@@ -112,10 +113,11 @@ export function ChatPanel() {
         </form>
       ) : (
         <p className="chat-name">
-          Chatting as <b>{name}</b>
-          <button type="button" className="link-button" onClick={() => setEditingName(true)}>
-            Change
-          </button>
+          <ActingAs verb="Chatting">
+            <button type="button" className="link-button" onClick={() => setEditingName(true)}>
+              Change
+            </button>
+          </ActingAs>
         </p>
       )}
 

@@ -1,4 +1,5 @@
 import type { LfgPost } from '../lib/types'
+import { createId } from '../utils/id'
 import { useSite } from './useSite'
 import { useViewer } from './useViewer'
 
@@ -16,12 +17,12 @@ export function useLfg() {
   const toggleJoin = (post: LfgPost) => {
     const joining = !isJoined(post)
     if (isOwn(post) || (joining && isFull(post))) return
-    dispatch({ type: 'lfg/join', id: post.id, joining })
-    viewer.toggleJoinedPost(post.id)
+    if (dispatch({ type: 'lfg/join', id: post.id, joining })) viewer.toggleJoinedPost(post.id)
   }
 
+  /** Returns false when the visitor has to sign in first. */
   const publish = (draft: LfgDraft) =>
-    dispatch({ type: 'lfg/post', post: { ...draft, author: viewer.name, authorId: viewer.id } })
+    dispatch({ type: 'lfg/post', post: { ...draft, id: createId(), author: viewer.name, authorId: viewer.id } })
 
   const remove = (post: LfgPost) => {
     if (isOwn(post)) dispatch({ type: 'lfg/remove', id: post.id })

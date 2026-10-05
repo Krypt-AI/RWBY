@@ -1,0 +1,44 @@
+import type { SiteState, ViewerState } from '../../lib/types'
+import { createSeedState } from '../../lib/seed'
+import { createId } from '../../utils/id'
+import { load, save, subscribe } from '../storage'
+import type { SiteStore, ViewerStore } from './types'
+
+/**
+ * v2 added game/music polls, the LFG board and the music queue.
+ * v3 added game rooms and swapped the anime and manga polls for the seasonal anime poll.
+ */
+const SITE_KEY = 'site.v3'
+const VIEWER_KEY = 'viewer.v1'
+
+/** The whole site in this browser's storage, synced between its open tabs. */
+export const localSiteStore: SiteStore = {
+  initialState: () => load(SITE_KEY, createSeedState),
+  connect(sync) {
+    sync.setStatus('ready')
+    return subscribe<SiteState>(SITE_KEY, next => sync.update(() => next))
+  },
+  persist: state => save(SITE_KEY, state),
+  send: () => Promise.resolve(),
+}
+
+function createViewer(): ViewerState {
+  return {
+    id: createId(),
+    name: `Huntsman-${Math.floor(1000 + Math.random() * 9000)}`,
+    ballots: {},
+    rsvps: [],
+    likedTracks: [],
+    joinedPosts: [],
+  }
+}
+
+/** A random per-browser identity. Changes are saved by persist(), so the setters have nothing to send. */
+export const localViewerStore: ViewerStore = {
+  // Fills in fields added after a viewer was first saved.
+  initialViewer: () => ({ ...createViewer(), ...load<Partial<ViewerState>>(VIEWER_KEY, () => ({})) }),
+  connect: () => () => {},
+  persist: viewer => save(VIEWER_KEY, viewer),
+  setName: () => Promise.resolve(),
+  setRsvp: () => Promise.resolve(),
+}
