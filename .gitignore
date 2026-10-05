@@ -4,6 +4,10 @@ dist/
 .env
 .env.local
 
+# Supabase CLI working files
+database/supabase/.temp/
+database/supabase/.branches/
+
 # Emitted by older tsconfig settings
 frontend/vite.config.js
 frontend/vite.config.d.ts
