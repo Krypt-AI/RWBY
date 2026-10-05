@@ -40,6 +40,7 @@
 
 /* ---------- Home: hero ---------- */
 .hero {
+  --hero-copy-width: 30rem;
   position: relative;
   display: grid;
   align-items: center;
@@ -51,15 +52,24 @@
   clip-path: polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 0 100%);
 }
 
+/*
+ * The whole lineup, never cropped: the art takes the hero's height at its own proportions and
+ * slides under the copy only until Weiss's panel (27.6% across the image) meets the copy's edge.
+ * Narrower heroes scale it down instead. Ruby fades in under the end of the copy, and "lighten"
+ * lets the image's black take on the panel colour, so the art has no visible edges.
+ */
 .hero-art {
   position: absolute;
-  inset: 0 0 0 auto;
-  width: 56%;
+  top: 0;
+  right: 0;
+  width: auto;
   height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
-  mask-image: linear-gradient(90deg, transparent, #000 22%);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%);
+  max-width: calc((100% - var(--space-7) - var(--hero-copy-width)) / 0.724);
+  object-fit: contain;
+  object-position: right center;
+  mix-blend-mode: lighten;
+  mask-image: linear-gradient(90deg, transparent, #000 28%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%);
 }
 
 .hero-copy {
@@ -67,7 +77,7 @@
   z-index: 1;
   display: grid;
   gap: var(--space-4);
-  max-width: 30rem;
+  max-width: var(--hero-copy-width);
 }
 
 .hero h1 {
@@ -230,19 +240,21 @@
 @media (max-width: 960px) {
   .hero {
     min-height: 0;
-    padding: var(--space-6) var(--space-5);
-    align-items: end;
-    padding-top: 250px;
+    padding: 0 var(--space-5) var(--space-6);
   }
 
+  /* Stacked: the whole lineup spans the top edge to edge, then settles behind the copy. */
   .hero-art {
-    width: 100%;
-    height: 280px;
-    inset: 0 0 auto;
-    mask-image: linear-gradient(#000 40%, transparent);
-    -webkit-mask-image: linear-gradient(#000 40%, transparent);
+    position: static;
+    width: calc(100% + 2 * var(--space-5));
+    max-width: none;
+    height: auto;
+    max-height: 300px;
+    margin-inline: calc(-1 * var(--space-5));
+    object-position: center;
+    mask-image: linear-gradient(#000 76%, transparent);
+    -webkit-mask-image: linear-gradient(#000 76%, transparent);
   }
-
 }
 
 /* ---------- Live page ---------- */
@@ -322,12 +334,25 @@
   gap: var(--space-4);
 }
 
-/* Shows one quarter (one team band) of RWBY2.jpg. */
+/* The art beside each poll: by default one quarter (one team band) of RWBY2.jpg. */
 .band-card {
   aspect-ratio: 416 / 184;
-  background-size: 100% 400%;
-  background-repeat: no-repeat;
+  background: var(--art) center var(--art-y) / 100% 400% no-repeat;
   box-shadow: inset 0 0 0 1px var(--line), inset 0 -3px 0 var(--accent);
+}
+
+/*
+ * A full picture instead of a band, set into the panel the way page-header art is: it fades
+ * in from the sides, settles into the panel at the bottom and picks up the accent's glow.
+ */
+.band-card.is-picture {
+  background:
+    radial-gradient(24rem 9rem at 0% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    linear-gradient(90deg, var(--bg-raised), transparent 34%, transparent 82%, var(--bg-raised)),
+    linear-gradient(0deg, var(--bg-raised), transparent 40%),
+    linear-gradient(color-mix(in srgb, var(--bg-raised) 18%, transparent), color-mix(in srgb, var(--bg-raised) 18%, transparent)),
+    var(--art) center var(--art-y) / cover no-repeat,
+    var(--bg-raised);
 }
 
 .votes-blurb {

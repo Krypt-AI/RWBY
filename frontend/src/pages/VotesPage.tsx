@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Navigate, NavLink, useParams } from 'react-router-dom'
 import type { Category } from '../lib/types'
 import { CATEGORIES, CATEGORY_META, DEFAULT_CATEGORY, SEASONAL_CATEGORY, isCategory } from '../lib/categories'
@@ -8,13 +9,29 @@ import { PollBoard } from '../components/PollBoard'
 import { PollEditor } from '../components/PollEditor'
 import { SeasonCard } from '../components/anime/SeasonCard'
 import { SeasonControls } from '../components/anime/SeasonControls'
+import blakeArt from '../assets/images/Blake.jpg'
 import teamBands from '../assets/images/RWBY2.jpg'
 
+interface CategoryArt {
+  image: string
+  /** Picks the band of RWBY2.jpg, or frames a full picture vertically. */
+  positionY: string
+  /** A full picture, cropped to the card, rather than one band of RWBY2.jpg. */
+  isPicture?: boolean
+  label: string
+}
+
 /**
- * RWBY2.jpg stacks four team bands (Ruby, Weiss, Blake, Yang) vertically; each category
- * shows one via background-position. Weiss gets music because she's the team's singer.
+ * The art beside each poll. RWBY2.jpg stacks four team bands (Ruby, Weiss, Blake, Yang)
+ * vertically, and anime, music and movies each show one. Weiss gets music because she's the
+ * team's singer. Games show Blake's own art, framed on her hood and the "B".
  */
-const BAND_POSITION: Record<Category, string> = { anime: '0%', music: '33.333%', game: '66.667%', movie: '100%' }
+const CATEGORY_ART: Record<Category, CategoryArt> = {
+  anime: { image: teamBands, positionY: '0%', label: 'Ruby emblem art' },
+  music: { image: teamBands, positionY: '33.333%', label: 'Weiss emblem art' },
+  game: { image: blakeArt, positionY: '8%', isPicture: true, label: 'Blake art' },
+  movie: { image: teamBands, positionY: '100%', label: 'Yang emblem art' },
+}
 
 export function VotesPage() {
   const { category } = useParams()
@@ -24,6 +41,7 @@ export function VotesPage() {
   if (!isCategory(category)) return <Navigate to={`/votes/${DEFAULT_CATEGORY}`} replace />
 
   const meta = CATEGORY_META[category]
+  const art = CATEGORY_ART[category]
   const isSeasonal = category === SEASONAL_CATEGORY
 
   return (
@@ -47,10 +65,10 @@ export function VotesPage() {
         <PollBoard category={category} />
         <aside className="votes-side">
           <div
-            className={`band-card accent-${meta.accent}`}
-            style={{ backgroundImage: `url(${teamBands})`, backgroundPositionY: BAND_POSITION[category] }}
+            className={`band-card accent-${meta.accent}${art.isPicture ? ' is-picture' : ''}`}
+            style={{ '--art': `url(${art.image})`, '--art-y': art.positionY } as CSSProperties}
             role="img"
-            aria-label={`${meta.label} emblem art`}
+            aria-label={art.label}
           />
           <p className="votes-blurb">{meta.blurb}</p>
           {isSeasonal && <SeasonCard />}
