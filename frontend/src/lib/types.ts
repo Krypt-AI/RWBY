@@ -1,7 +1,10 @@
 export type Mode = 'user' | 'moderator'
 
+/** A Team RWBY member, named after her colour (see tokens.css). */
+export type TeamMember = 'ruby' | 'weiss' | 'blake' | 'yang'
+
 /** Team colours used as section accents (see tokens.css). */
-export type Accent = 'ruby' | 'weiss' | 'blake' | 'yang' | 'nora'
+export type Accent = TeamMember | 'nora'
 
 export type Category = 'game' | 'music' | 'anime' | 'movie'
 
