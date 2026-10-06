@@ -10,20 +10,22 @@ what "done" means and which decisions it needs first.
 - Built: the shared backend (Stage 2). The Supabase schema, security, API functions, realtime and seed live in
   `database/`, with 35 backend tests in `backend/`. The site uses it once `VITE_SUPABASE_URL` and
   `VITE_SUPABASE_PUBLISHABLE_KEY` are set, and runs as the local demo, with data in the browser, without them.
-- Not live yet: the Supabase project still has to be created ([database/README.md](../database/README.md)), and the
-  Vercel import (1c) is still to do. `main` matches GitHub, with the 2026-10-05 features merged.
+- Live: [rwby-red.vercel.app](https://rwby-red.vercel.app) deploys every push to `main` and runs on the hosted
+  Supabase project, with Discord sign-in. One migration is still to apply there:
+  `20261006000800_seed_without_sample_squads.sql` (`npx supabase db push` in `database/`, never `--include-seed`).
 - No frontend unit tests, lint or CI yet.
 
 ## Stage 1: Ship what's built (small)
 
 - [x] **1a.** Commit the 2026-10-05 features on a feature branch, review them, then merge to `main`.
-- [ ] **1b.** Clean up the abandoned GitHub Pages attempt: delete the untracked `.github/workflows/deploy.yml` (never
-  commit it) and decide whether to keep the no-op `basename` in [App.tsx](../frontend/src/App.tsx).
-- [ ] **1c.** Push `main`, import the repo into Vercel and set `VITE_MOD_PASSCODE` (see "Deploy (Vercel)" in the
-  root README).
+- [x] **1b.** Clean up the abandoned GitHub Pages attempt: the untracked workflow is deleted, and the `basename` in
+  [App.tsx](../frontend/src/App.tsx) stays.
+- [x] **1c.** Push `main` and import the repo into Vercel (see "Deploy (Vercel)" in the root README). The
+  `VITE_MOD_PASSCODE` only matters when the site runs as the local demo; on the shared backend moderators sign in
+  with Discord.
 - [ ] **1d.** Check production:
   - live MLBB stats load on the Vercel domain
-  - refreshing a deep link works
+  - refreshing a deep link works (checked)
   - the art and phone layout look right
 
 **Done when:** the public URL works end to end. Community data is still saved per browser.
@@ -36,7 +38,7 @@ what "done" means and which decisions it needs first.
   tests for the reducer, counter scoring, room phases and season maths; ESLint and Prettier; optionally CI on pull
   requests.
 - [x] **2b.** Schema and row-level security in [database/](../database/README.md), including the room tables: 5 seats,
-  5 picks and one vote per user per poll. Only the hosted Supabase project itself remains to be created.
+  5 picks and one vote per user per poll. The hosted Supabase project is set up and serves the live site.
 - [x] **2c.** Discord sign-in, with a moderator role replacing the passcode on the shared backend.
 - [x] **2d.** One API call per change instead of saving the whole site state, behind the existing hooks, so pages
   barely changed. The database computes vote, like and join counts.
@@ -46,8 +48,8 @@ what "done" means and which decisions it needs first.
   the backend docs are rewritten ([backend/README.md](../backend/README.md)).
 
 **Done when:** two friends on different devices see the same room, draft, chat and votes live, and the server
-enforces moderator rules. The server rules are covered by the backend tests. The two-device check waits for the
-hosted project.
+enforces moderator rules. The server rules are covered by the backend tests. The two-device check on the live site
+is still to do.
 
 ## Stage 3: Data integrations (medium)
 
@@ -73,8 +75,8 @@ hosted project.
 
 ## Stage 5: Polish and launch (small to medium)
 
-- [ ] **5a. Performance:** split the 307 KB bundle by page so the hero data loads only in the room, and convert the
-  art to WebP or AVIF.
+- [ ] **5a. Performance:** split the 550 KB bundle (160 KB gzipped) by page so the hero data loads only in the room,
+  and convert the rest of the art to WebP (Home and Squad already ship as WebP at two sizes).
 - [ ] **5b.** Accessibility checks on the hero grid and countdown, security headers in
   [vercel.json](../frontend/vercel.json), error monitoring and a health check for the live feed.
 - [ ] **5c.** README screenshots, a portfolio case study, an updated [Documentation.docx](Documentation.docx), and a
@@ -88,7 +90,6 @@ hosted project.
 
 In the order they block work:
 
-1. The GitHub Pages leftovers (1b).
-2. GitHub workflows for CI and the snapshot refresh (2a, 3d).
-3. Vercel functions for the two proxies (3a, 3c).
-4. The Valorant data source (3e).
+1. GitHub workflows for CI and the snapshot refresh (2a, 3d).
+2. Vercel functions for the two proxies (3a, 3c).
+3. The Valorant data source (3e).
