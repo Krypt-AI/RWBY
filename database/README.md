@@ -20,6 +20,8 @@ database/supabase/
     …_realtime.sql            live updates
     …_seed_without_sample_squads.sql
                               the starter content without sample squad posts (replaces …_seed_content.sql's)
+    …_room_preferences.sql    each room member's role and favourite heroes or agents
+    …_room_lineup_choice.sql  the lineup a room settles on (a Valorant map's comp), shared by everyone in it
 ```
 
 ## Tables
@@ -35,15 +37,15 @@ The shapes mirror `frontend/src/lib/types.ts`.
 | `polls`, `poll_options`, `ballots` | One poll per category, its options with a vote count, one ballot per member and poll | `Poll`, `PollOption`, `Ballot` |
 | `lfg_posts`, `lfg_joins` | The squad board (newest 50), with a join count | `LfgPost`, `ViewerState.joinedPosts` |
 | `tracks`, `track_likes` | The song queue (newest 100), with a like count | `Track`, `ViewerState.likedTracks` |
-| `game_rooms`, `room_members`, `room_enemy_picks` | One room per game: start time, members, enemy picks in pick order | `GameRoom`, `RoomMember` |
+| `game_rooms`, `room_members`, `room_enemy_picks` | One room per game: start time, chosen lineup, members with their role and favourites, enemy picks in pick order | `GameRoom`, `RoomMember` |
 
 What the database guarantees on its own:
 
 - **Counts can't drift.** `poll_options.votes`, `tracks.likes` and `lfg_posts.joined` are kept by triggers, one row
   change at a time, so simultaneous clicks never lose a count.
-- **Limits hold under load.** Five seats and five enemy picks per room, a squad's open spots, one ballot per member
-  and poll, and one pinned chat message. Room and squad changes lock the row first, so two people can't take the last
-  spot.
+- **Limits hold under load.** Five seats and five enemy picks per room, a role the game has and at most three
+  favourites per member, a squad's open spots, one ballot per member and poll, and one pinned chat message. Room and
+  squad changes lock the row first, so two people can't take the last spot.
 - **Choices stay private.** Ballots, RSVPs, squad joins and song likes are readable only by their owner. The totals
   stay public.
 - **No direct writes.** Visitors and members can read the tables but never write them. Every change goes through an

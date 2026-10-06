@@ -31,7 +31,7 @@ picks the mode, so nothing else in the app checks for it.
 | Who | How | Can |
 | --- | --- | --- |
 | Visitor | Not signed in | Read everything public. Trying to take part opens a "sign in" prompt. |
-| Member | Signed in with Discord | Chat, vote, RSVP, post and join squads, add and like songs, join a game room, and run a room they're in (start time, enemy picks). Remove their own squad posts. Rename themselves. |
+| Member | Signed in with Discord | Chat, vote, RSVP, post and join squads, add and like songs, join a game room, choose their own role and favourites there, and run a room they're in (start time, enemy picks, the chosen map). Remove their own squad posts. Rename themselves. |
 | Moderator | `profiles.role = 'moderator'` | Everything a member can, plus the moderator tools: stream, banner, playlist, schedule, polls, any squad post or song, any room, and resetting the site. |
 
 The server enforces every rule. The UI hides controls people can't use, but a request that skips the UI gets the same
@@ -71,11 +71,13 @@ the people in that game's room. Arguments named `p_id` take the client-generated
 | `track/remove` | `remove_track(p_id)` | Moderator | |
 | `room/join` | `join_room(p_game)` | Member | Five seats. |
 | `room/leave` | `leave_room(p_game)` | Member | |
+| `room/setPreferences` | `set_room_preferences(p_game, p_role, p_picks)` | Room member, for themselves | A role the game has, or `null` to fill. Up to three favourites, trimmed, repeats dropped. |
 | `room/setStart` | `set_room_start(p_game, p_starts_at)` | Room member or moderator | `null` clears it. |
 | `room/pickEnemy` | `pick_enemy(p_game, p_hero)` | Room member or moderator | Five picks, kept in pick order, no repeats. |
 | `room/unpickEnemy` | `unpick_enemy(p_game, p_hero)` | Room member or moderator | |
 | `room/clearPicks` | `clear_enemy_picks(p_game)` | Room member or moderator | |
-| `room/reset` | `reset_room(p_game)` | Moderator | No members, no start time, no picks. |
+| `room/setLineup` | `set_room_lineup(p_game, p_lineup)` | Room member or moderator | A guide lineup's name, e.g. a Valorant map. `null` goes back to the first. |
+| `room/reset` | `reset_room(p_game)` | Moderator | No members, no start time, no picks, no chosen lineup. |
 | `site/reset` | `reset_site(p_time_zone)` | Moderator | Restores the starter content. Accounts stay. Sessions land on the moderator's local evenings. |
 
 Reads go straight to the tables (`supabase.from(...).select(...)`), filtered by row-level security. The selects live
@@ -111,6 +113,6 @@ npm test
 
 The tests boot a real Postgres in-process ([PGlite](https://pglite.dev), no Docker), add the few Supabase pieces the
 migrations expect (`tests/supabase-stub.sql`), apply the real migrations and seed, then call the API as visitors,
-members and moderators, with grants and row-level security in force. The 35 tests cover sign-up, every permission
-rule, the counters, the room, squad and chat limits, pick and lineup ordering, privacy of personal rows, and the site
+members and moderators, with grants and row-level security in force. The 38 tests cover sign-up, every permission
+rule, the counters, the room, squad and chat limits, room roles, favourites and lineups, pick and lineup ordering, privacy of personal rows, and the site
 reset. Node 22 or newer.
