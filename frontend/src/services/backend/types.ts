@@ -1,12 +1,6 @@
 import type { Account, SiteState, ViewerState } from '../../lib/types'
 import type { SiteAction, SiteUpdate } from '../../lib/siteReducer'
 
-/**
- * 'local': no backend configured, so data stays in this browser (the demo mode).
- * 'shared': the Supabase backend, so everyone sees the same site.
- */
-export type BackendKind = 'local' | 'shared'
-
 /** 'unreachable': the first load failed and is being retried. */
 export type SiteStatus = 'loading' | 'ready' | 'unreachable'
 

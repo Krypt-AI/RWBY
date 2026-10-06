@@ -6,7 +6,7 @@ export type SeasonalAnime = {
   note: string
 }
 
-export type SeasonLineup = { season: AnimeSeason; shows: SeasonalAnime[] }
+type SeasonLineup = { season: AnimeSeason; shows: SeasonalAnime[] }
 
 /**
  * Hand-picked shows for the seasonal anime poll, newest season first. Add next season's

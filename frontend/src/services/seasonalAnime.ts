@@ -11,7 +11,7 @@ import { sameSeason } from '../lib/animeSeasons'
  * and doesn't answer browser requests (no CORS), so that call has to go through a small
  * proxy such as a Vercel function.
  */
-export type LineupSource = {
+type LineupSource = {
   id: 'curated' | 'myanimelist'
   name: string
   /** Shows airing in the season, or an empty list when the source has none yet. */

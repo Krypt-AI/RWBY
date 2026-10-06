@@ -1,6 +1,6 @@
 import type { IconName } from '../components/Icon'
 
-export type NavItem = {
+type NavItem = {
   to: string
   label: string
   /** Label for the mobile tab bar, when the full label is too long. */

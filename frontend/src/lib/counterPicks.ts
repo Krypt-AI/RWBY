@@ -3,11 +3,11 @@ import type { DraftHero, DraftKit, HeroClass, LiveRates, MatchupStat, Threat, Ti
 /** 'strong': a clear edge on several fronts. 'situational': a small edge, check your comp first. */
 export type Fit = 'strong' | 'good' | 'situational'
 
-export type Reason = { tone: 'good' | 'bad'; text: string }
+type Reason = { tone: 'good' | 'bad'; text: string }
 
-export type CounterSuggestion = { hero: DraftHero; score: number; fit: Fit; reasons: Reason[] }
+type CounterSuggestion = { hero: DraftHero; score: number; fit: Fit; reasons: Reason[] }
 
-export type CounterInput = {
+type CounterInput = {
   pool: DraftHero[]
   enemies: DraftHero[]
   /** Live best and worst picks against each enemy, keyed by enemy id. */
@@ -94,7 +94,7 @@ export function suggestCounters(input: CounterInput): CounterSuggestion[] {
     .slice(0, limit)
 }
 
-export type ThreatRead = { threat: Threat; heroes: string[] }
+type ThreatRead = { threat: Threat; heroes: string[] }
 
 const PHYSICAL_CLASSES: HeroClass[] = ['marksman', 'assassin', 'fighter']
 

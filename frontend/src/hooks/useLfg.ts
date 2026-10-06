@@ -3,7 +3,7 @@ import { createId } from '../utils/id'
 import { useSite } from './useSite'
 import { useViewer } from './useViewer'
 
-export type LfgDraft = Omit<LfgPost, 'id' | 'joined' | 'at' | 'author' | 'authorId'>
+type LfgDraft = Omit<LfgPost, 'id' | 'joined' | 'at' | 'author' | 'authorId'>
 
 /** The Squad board plus the current viewer's relationship to each post. */
 export function useLfg() {

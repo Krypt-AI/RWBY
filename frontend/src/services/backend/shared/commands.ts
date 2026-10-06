@@ -2,7 +2,7 @@ import type { SiteAction } from '../../../lib/siteReducer'
 import { SLICES, type Slice } from './siteQueries'
 
 /** One API call (a function in …_api.sql) and the slices it changes. */
-export type Command = {
+type Command = {
   fn: string
   args: Record<string, unknown>
   slices: Slice[]

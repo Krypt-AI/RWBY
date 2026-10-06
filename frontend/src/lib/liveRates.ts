@@ -1,6 +1,6 @@
 import type { LiveRate, LiveRates } from '../data/games/types'
 
-export type RateLeader = { name: string; value: number }
+type RateLeader = { name: string; value: number }
 
 /** Every hero or agent ordered by one live rate, highest first. */
 export function rankBy(rates: Map<string, LiveRates>, rate: LiveRate): RateLeader[] {

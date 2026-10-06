@@ -35,7 +35,7 @@ export type TierEntry = {
   trend?: 'up' | 'down'
 }
 
-export type LineupSlot = { name: string; roleId: string }
+type LineupSlot = { name: string; roleId: string }
 
 export type Lineup = {
   name: string
@@ -56,7 +56,7 @@ export type Loadout = {
   note: string
 }
 
-export type EquipmentItem = { name: string; cost?: string; detail: string }
+type EquipmentItem = { name: string; cost?: string; detail: string }
 
 export type EquipmentGroup = { title: string; items: EquipmentItem[] }
 

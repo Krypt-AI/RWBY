@@ -1,7 +1,7 @@
 import type { RoomPhase } from '../../lib/rooms'
 import { formatCountdown, formatRelative, formatSessionDate } from '../../utils/format'
 
-export type ClockCopy = {
+type ClockCopy = {
   label: string
   value: string
   note: string

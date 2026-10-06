@@ -6,7 +6,7 @@ import { initials } from '../utils/format'
 import { Icon } from './Icon'
 
 /** The member's Discord avatar, or their initials when Discord has none. */
-export function AccountAvatar({ account }: { account: Account }) {
+function AccountAvatar({ account }: { account: Account }) {
   return account.avatarUrl ? (
     <img className="avatar" src={account.avatarUrl} alt="" referrerPolicy="no-referrer" />
   ) : (

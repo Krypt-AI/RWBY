@@ -11,7 +11,7 @@ import { backend, type SiteStatus } from '../services/backend'
  * The UI only offers 'lfg/remove' on the viewer's own posts, and room edits to room members;
  * on the shared backend the server enforces both.
  */
-export type ViewerAction = Extract<
+type ViewerAction = Extract<
   SiteAction,
   {
     type:

@@ -24,4 +24,4 @@ function createBackend(): Backend {
 
 export const backend = createBackend()
 
-export type { BackendKind, SiteStatus } from './types'
+export type { SiteStatus } from './types'

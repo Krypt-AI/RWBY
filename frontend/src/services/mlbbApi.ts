@@ -13,7 +13,7 @@ const DAYS = 7
 
 export type MlbbRank = 'all' | 'epic' | 'legend' | 'mythic' | 'honor' | 'glory'
 
-export type HeroRates = LiveRates & { name: string }
+type HeroRates = LiveRates & { name: string }
 
 type Envelope<T> = { code: number; message: string; data: { records: { data: T }[] } }
 

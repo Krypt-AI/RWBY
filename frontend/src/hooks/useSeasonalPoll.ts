@@ -6,7 +6,7 @@ import { lineupSource } from '../services/seasonalAnime'
 import { useSite } from './useSite'
 
 /** 'empty': the source has no lineup for that season yet. */
-export type LineupStatus = 'idle' | 'loading' | 'empty' | 'error'
+type LineupStatus = 'idle' | 'loading' | 'empty' | 'error'
 
 /** The seasonal anime poll, the season airing now and a way for moderators to move to it. */
 export function useSeasonalPoll() {
