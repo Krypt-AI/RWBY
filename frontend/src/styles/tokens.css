@@ -20,8 +20,9 @@
   --ruby-deep: #3a0d14;
   --weiss: #eaf1fb;
   --weiss-ice: #9fc6ef;
-  --blake: #a895cc;
-  --blake-grey: #4a4853;
+  /* Blake is black and purple: a vivid violet, and a near-black with violet in it. */
+  --blake: #9d6bff;
+  --blake-deep: #140b24;
   --yang: #f4c430;
   --yang-deep: #2e2509;
   /* Nora (team JNPR): the music accent. */
@@ -72,10 +73,17 @@
 
 .tone-ruby { color: var(--ruby); }
 .tone-weiss { color: var(--weiss); }
-.tone-blake { color: var(--text-3); }
+/* Blake's letter is black, edged and haloed in her violet. */
+.tone-blake {
+  color: var(--blake-deep);
+  text-shadow:
+    0 0 1px var(--blake),
+    0 0 2px var(--blake),
+    0 0 14px color-mix(in srgb, var(--blake) 70%, transparent);
+}
 .tone-yang { color: var(--yang); }
 
 .bg-ruby { background: var(--ruby); }
 .bg-weiss { background: var(--weiss); }
-.bg-blake { background: var(--blake-grey); }
+.bg-blake { background: var(--blake); }
 .bg-yang { background: var(--yang); }

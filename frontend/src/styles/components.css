@@ -903,9 +903,15 @@ input[type='datetime-local'] {
   border: 0;
 }
 
-/* Off air: Blake's art (Blake.jpg), framed on her hood and the "B", over a faint wash of her violet. */
+/*
+ * Off air: Blake's art (Blake.jpg, in greys) recast in her black and purple. Its brightness is
+ * laid over a violet that deepens to her purple-black towards the edges ("luminosity" keeps the
+ * art's light and takes the colour underneath), so her hood and cloak go black, the "B" and the
+ * light flecks go lilac, and the frame dissolves into the dark.
+ */
 .player.is-offline {
-  background: linear-gradient(160deg, color-mix(in srgb, var(--blake) 26%, #000), #000 70%);
+  isolation: isolate;
+  background: radial-gradient(70% 90% at 62% 38%, var(--blake), var(--blake-deep) 70%);
 }
 
 .player.is-offline img {
@@ -915,7 +921,10 @@ input[type='datetime-local'] {
   height: 100%;
   object-fit: cover;
   object-position: center 12%;
-  opacity: 0.78;
+  filter: contrast(1.25) brightness(0.8);
+  mix-blend-mode: luminosity;
+  mask-image: radial-gradient(85% 100% at 62% 38%, #000 45%, transparent);
+  -webkit-mask-image: radial-gradient(85% 100% at 62% 38%, #000 45%, transparent);
 }
 
 .player-message {

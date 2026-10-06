@@ -160,19 +160,20 @@
   to { scale: 1.15; }
 }
 
-/* ---------- Blake: the gold slivers of her art, drifting down at its angle (Live) ---------- */
+/* ---------- Blake: violet slivers of light cutting through her shadows (Live) ---------- */
 .art-effect.is-slivers i {
   --cycle: 8s;
   --motion: sliver-fall;
-  --glow: calc(0.25 + var(--depth) * 0.5);
+  --glow: calc(0.35 + var(--depth) * 0.5);
   top: -2em;
   width: 2px;
   height: calc(0.7em + var(--depth) * 0.9em);
   border-radius: 1px;
-  background: linear-gradient(transparent, var(--yang));
+  background: linear-gradient(transparent, var(--blake) 65%, #efe6ff);
+  filter: drop-shadow(0 0 3px var(--blake));
 }
 
-/* Tilted like the art's slivers (top to the right), falling along their length. */
+/* Tilted with the top to the right, falling along their length. */
 @keyframes sliver-fall {
   0% { transform: translate(0, 0) rotate(20deg); opacity: 0; }
   12% { opacity: var(--glow); }
