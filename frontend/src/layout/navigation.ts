@@ -12,8 +12,8 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Home', icon: 'home' },
-  { to: '/games', label: 'Games', icon: 'gamepad' },
   { to: '/squad', label: 'Squad', icon: 'users' },
+  { to: '/games', label: 'Games', icon: 'gamepad' },
   { to: '/music', label: 'Music', icon: 'music' },
   { to: '/live', label: 'Live', icon: 'live' },
   { to: '/votes', label: 'Votes', icon: 'vote' },
