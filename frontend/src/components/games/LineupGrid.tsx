@@ -1,5 +1,7 @@
+import { Link } from 'react-router-dom'
 import type { GameGuide } from '../../data/games/types'
 import { roleName } from '../../data/games'
+import { Icon } from '../Icon'
 import { SectionIntro } from './SectionIntro'
 
 export function LineupGrid({ game }: { game: GameGuide }) {
@@ -27,6 +29,10 @@ export function LineupGrid({ game }: { game: GameGuide }) {
           </li>
         ))}
       </ul>
+
+      <Link to={`/games/${game.id}/room`} className="link-arrow">
+        Fit a lineup to your squad in the game room <Icon name="arrow" size={14} />
+      </Link>
     </section>
   )
 }

@@ -158,12 +158,20 @@ export const toTrack = (row: TrackRow): Track => ({
 })
 
 export const ROOM_COLUMNS =
-  'game, starts_at, room_members(id, user_id, name, joined_at), room_enemy_picks(hero, picked_at)'
+  'game, starts_at, lineup, room_members(id, user_id, name, joined_at, role, picks), room_enemy_picks(hero, picked_at)'
 export type RoomRow = {
   game: GameId
   starts_at: string | null
+  lineup: string | null
   /** user_id is null for seeded members. */
-  room_members: { id: string; user_id: string | null; name: string; joined_at: string }[]
+  room_members: {
+    id: string
+    user_id: string | null
+    name: string
+    joined_at: string
+    role: string | null
+    picks: string[]
+  }[]
   room_enemy_picks: { hero: string; picked_at: string }[]
 }
 
@@ -173,6 +181,9 @@ export const toRoom = (row: RoomRow): GameRoom => ({
     id: member.user_id ?? member.id,
     name: member.name,
     joinedAt: iso(member.joined_at),
+    role: member.role,
+    picks: member.picks,
   })),
   enemyPicks: row.room_enemy_picks.map(pick => pick.hero),
+  lineup: row.lineup,
 })

@@ -1,4 +1,4 @@
-import type { SiteState, ViewerState } from '../../lib/types'
+import type { GameRoom, RoomMember, SiteState, ViewerState } from '../../lib/types'
 import { createSeedState } from '../../lib/seed'
 import { createId } from '../../utils/id'
 import { load, save, subscribe } from '../storage'
@@ -16,9 +16,28 @@ function withoutSampleSquads(state: SiteState): SiteState {
   return { ...state, lfg: state.lfg.filter(post => post.authorId !== 'seed') }
 }
 
+/** A room saved before rooms had a chosen lineup and members a role and favourites. */
+type SavedRoom = Omit<GameRoom, 'lineup' | 'members'> & {
+  lineup?: string | null
+  members: (Omit<RoomMember, 'role' | 'picks'> & Partial<Pick<RoomMember, 'role' | 'picks'>>)[]
+}
+
+/** Fills in what older saved rooms lack: no chosen lineup, and every member fills with no favourites. */
+function withCurrentRooms(state: SiteState): SiteState {
+  const upgrade = (room: SavedRoom): GameRoom => ({
+    ...room,
+    lineup: room.lineup ?? null,
+    members: room.members.map(member => ({ ...member, role: member.role ?? null, picks: member.picks ?? [] })),
+  })
+  const rooms = Object.fromEntries(
+    Object.entries(state.rooms).map(([game, room]) => [game, upgrade(room)]),
+  ) as SiteState['rooms']
+  return { ...state, rooms }
+}
+
 /** The whole site in this browser's storage, synced between its open tabs. */
 export const localSiteStore: SiteStore = {
-  initialState: () => withoutSampleSquads(load(SITE_KEY, createSeedState)),
+  initialState: () => withCurrentRooms(withoutSampleSquads(load(SITE_KEY, createSeedState))),
   connect(sync) {
     sync.setStatus('ready')
     return subscribe<SiteState>(SITE_KEY, next => sync.update(() => next))

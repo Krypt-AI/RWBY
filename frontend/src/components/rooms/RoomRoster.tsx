@@ -1,11 +1,13 @@
+import type { GameGuide } from '../../data/games/types'
+import { roleName } from '../../data/games'
 import type { GameRoomControls } from '../../hooks/useGameRoom'
 import { ROOM_SIZE } from '../../lib/rooms'
 import { initials } from '../../utils/format'
 import { ActingAs } from '../ActingAs'
 import { Icon } from '../Icon'
 
-/** Five seats: who's in, who's missing, and the viewer's join or leave button. */
-export function RoomRoster({ controls }: { controls: GameRoomControls }) {
+/** Five seats: who's in, what they play, who's missing, and the viewer's join or leave button. */
+export function RoomRoster({ game, controls }: { game: GameGuide; controls: GameRoomControls }) {
   const { room, viewerId, isMember, isFull, join, leave } = controls
   const seats = Array.from({ length: ROOM_SIZE }, (_, index) => room.members[index])
 
@@ -18,7 +20,13 @@ export function RoomRoster({ controls }: { controls: GameRoomControls }) {
               <span className="avatar" aria-hidden="true">
                 {initials(member.name)}
               </span>
-              <span className="room-seat-name">{member.name}</span>
+              <span className="room-seat-body">
+                <span className="room-seat-name">{member.name}</span>
+                {member.picks.length > 0 && <span className="room-seat-picks">{member.picks.join(' · ')}</span>}
+              </span>
+              <span className={`room-seat-role ${member.role ? '' : 'is-fill'}`}>
+                {member.role ? roleName(game, member.role) : 'Fill'}
+              </span>
               {member.id === viewerId && <span className="room-you">You</span>}
             </li>
           ) : (

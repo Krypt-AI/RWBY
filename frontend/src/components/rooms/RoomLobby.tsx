@@ -3,14 +3,16 @@ import type { GameRoomControls } from '../../hooks/useGameRoom'
 import { ROOM_SIZE } from '../../lib/rooms'
 import { ModPanel } from '../Panel'
 import { RoomClock } from './RoomClock'
+import { RoomPreferences } from './RoomPreferences'
 import { RoomRoster } from './RoomRoster'
 
-/** Who's in the room and when the squad starts. */
+/** Who's in the room and what they play, and when the squad starts. */
 export function RoomLobby({ game, controls }: { game: GameGuide; controls: GameRoomControls }) {
   const { room, reset } = controls
+  const clears = `members, the start time and ${game.draft ? 'enemy picks' : 'the chosen map'}`
 
   const resetRoom = () => {
-    if (window.confirm(`Empty the ${game.shortName} room? This clears members, the start time and enemy picks.`)) reset()
+    if (window.confirm(`Empty the ${game.shortName} room? This clears ${clears}.`)) reset()
   }
 
   return (
@@ -25,12 +27,14 @@ export function RoomLobby({ game, controls }: { game: GameGuide; controls: GameR
           </span>
         </div>
         <RoomClock controls={controls} />
-        <RoomRoster controls={controls} />
+        <RoomRoster game={game} controls={controls} />
       </section>
+
+      <RoomPreferences game={game} controls={controls} />
 
       <ModPanel title="Room controls">
         <div className="mod-row">
-          <p className="muted">Clears members, the start time and enemy picks.</p>
+          <p className="muted">Clears {clears}.</p>
           <button type="button" className="btn btn-danger" onClick={resetRoom}>
             Reset room
           </button>

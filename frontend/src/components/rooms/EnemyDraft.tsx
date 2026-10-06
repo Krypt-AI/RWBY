@@ -1,9 +1,8 @@
 import type { DraftHero, DraftKit } from '../../data/games/types'
 import type { GameRoomControls } from '../../hooks/useGameRoom'
 import { ENEMY_PICK_LIMIT } from '../../lib/rooms'
-import { Icon } from '../Icon'
-import { HeroPortrait } from '../games/HeroPortrait'
 import { HeroSearch } from './HeroSearch'
+import { PickSlots } from './PickSlots'
 
 type EnemyDraftProps = {
   kit: DraftKit
@@ -14,7 +13,6 @@ type EnemyDraftProps = {
 /** The enemy's five picks, shared by everyone in the room. */
 export function EnemyDraft({ kit, enemies, controls }: EnemyDraftProps) {
   const { canEdit, pickEnemy, unpickEnemy, clearPicks } = controls
-  const slots = Array.from({ length: ENEMY_PICK_LIMIT }, (_, index) => enemies[index])
 
   return (
     <section className="panel enemy-draft" aria-labelledby="enemy-draft-title">
@@ -29,36 +27,22 @@ export function EnemyDraft({ kit, enemies, controls }: EnemyDraftProps) {
         )}
       </div>
 
-      <ol className="enemy-slots">
-        {slots.map((hero, index) =>
-          hero ? (
-            <li key={hero.id} className="enemy-slot is-picked">
-              <HeroPortrait name={hero.name} src={hero.portrait} />
-              <span className="enemy-slot-name">{hero.name}</span>
-              {canEdit && (
-                <button
-                  type="button"
-                  className="enemy-slot-remove"
-                  onClick={() => unpickEnemy(hero.name)}
-                  aria-label={`Remove ${hero.name}`}
-                >
-                  <Icon name="close" size={14} />
-                </button>
-              )}
-            </li>
-          ) : (
-            <li key={`open-${index}`} className="enemy-slot">
-              <span className="enemy-slot-name">Pick {index + 1}</span>
-            </li>
-          ),
-        )}
-      </ol>
+      <PickSlots
+        label="Enemy picks"
+        side="enemy"
+        count={ENEMY_PICK_LIMIT}
+        picks={enemies}
+        placeholder={index => `Pick ${index + 1}`}
+        onRemove={canEdit ? unpickEnemy : undefined}
+      />
 
       {canEdit ? (
         <HeroSearch
-          heroes={kit.heroes}
-          takenIds={new Set(enemies.map(hero => hero.id))}
-          isFull={enemies.length >= ENEMY_PICK_LIMIT}
+          label="Add an enemy pick"
+          noun="heroes"
+          options={kit.heroes}
+          taken={new Set(enemies.map(hero => hero.name))}
+          fullText={enemies.length >= ENEMY_PICK_LIMIT ? 'All five picks are in' : undefined}
           onPick={pickEnemy}
         />
       ) : (

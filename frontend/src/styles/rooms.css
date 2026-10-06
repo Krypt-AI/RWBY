@@ -142,11 +142,35 @@
   border-color: var(--accent);
 }
 
-.room-seat-name {
+.room-seat-body {
   flex: 1;
   min-width: 0;
+  display: grid;
+}
+
+.room-seat-name {
   font-weight: 500;
   overflow-wrap: anywhere;
+}
+
+.room-seat-picks {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+.room-seat-role {
+  color: var(--text-2);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.room-seat-role.is-fill {
+  color: var(--text-3);
 }
 
 .room-you {
@@ -165,14 +189,23 @@
   gap: var(--space-3);
 }
 
-/* ---------- Enemy draft ---------- */
-.enemy-slots {
+/* ---------- Draft slots: enemy picks and favourites ---------- */
+.pick-slots {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--slot-count, 5), minmax(0, 1fr));
   gap: var(--space-2);
 }
 
-.enemy-slot {
+/* Enemy picks read red, as on the in-game draft screen; the squad's own read in the page accent. */
+.pick-slots.is-enemy {
+  --pick-tint: var(--ruby);
+}
+
+.pick-slots.is-ally {
+  --pick-tint: var(--accent);
+}
+
+.pick-slot {
   position: relative;
   display: grid;
   justify-items: center;
@@ -185,21 +218,20 @@
   text-align: center;
 }
 
-/* Enemy picks read red, as on the in-game draft screen. */
-.enemy-slot.is-picked {
+.pick-slot.is-picked {
   border: 1px solid var(--line);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--ruby) 16%, transparent), transparent 75%),
+    linear-gradient(180deg, color-mix(in srgb, var(--pick-tint) 16%, transparent), transparent 75%),
     var(--surface-2);
   color: var(--text);
 }
 
-.enemy-slot .hero-portrait {
+.pick-slot .hero-portrait {
   width: 56px;
   height: 56px;
 }
 
-.enemy-slot-name {
+.pick-slot-name {
   font-family: var(--font-label);
   font-size: var(--text-sm);
   font-weight: 600;
@@ -209,7 +241,7 @@
   overflow-wrap: anywhere;
 }
 
-.enemy-slot-remove {
+.pick-slot-remove {
   position: absolute;
   top: 2px;
   right: 2px;
@@ -221,13 +253,13 @@
   transition: color var(--duration), background var(--duration);
 }
 
-.enemy-slot-remove:hover {
+.pick-slot-remove:hover {
   color: var(--text);
   background: var(--line);
 }
 
 @media (max-width: 600px) {
-  .enemy-slots {
+  .pick-slots.is-enemy {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -293,100 +325,127 @@
   height: 48px;
 }
 
-/* ---------- Counter suggestions ---------- */
-.counter-list {
+/* ---------- Lineup plan: recommended lineup and map comps ---------- */
+.lineup-notes {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--text-sm);
+}
+
+.lineup-notes li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.lineup-notes svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--accent);
+}
+
+.lane-plan {
   display: grid;
   transition: opacity var(--duration);
 }
 
-.counter-list[aria-busy='true'] {
+.lane-plan[aria-busy='true'] {
   opacity: 0.6;
 }
 
-.counter-row {
+.lane-row {
   display: grid;
-  grid-template-columns: 22px 48px minmax(0, 1fr) auto;
+  grid-template-columns: 128px 48px minmax(0, 1fr) auto;
   align-items: start;
   gap: var(--space-3);
   padding: var(--space-3) 0;
   border-top: 1px solid var(--line);
 }
 
-.counter-row:first-child {
+.lane-row:first-child {
   border-top: 0;
 }
 
-.counter-row .hero-portrait {
+.lane-row .hero-portrait {
   width: 48px;
   height: 48px;
 }
 
-.counter-rank {
-  padding-top: var(--space-2);
+.lane-seat {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding-top: var(--space-1);
+}
+
+.lane-player {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.lane-player.is-open {
   color: var(--text-3);
-  font-family: var(--font-label);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
 }
 
-.counter-row:first-child .counter-rank {
-  color: var(--accent);
+.lane-player small {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+  font-weight: 400;
 }
 
-.counter-body {
+.lane-body {
   display: grid;
   gap: var(--space-1);
   min-width: 0;
 }
 
-.counter-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--space-2);
-}
-
-.counter-head b {
+.lane-hero {
   font-weight: 600;
 }
 
-.counter-lanes {
+.lane-aside {
   color: var(--text-3);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
 }
 
-.counter-reasons {
+.lane-aside b {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.pick-reasons {
   display: grid;
   gap: 2px;
   font-size: var(--text-sm);
 }
 
-.counter-reasons li {
+.pick-reasons li {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   color: var(--text-2);
 }
 
-.counter-reasons svg {
+.pick-reasons svg {
   flex-shrink: 0;
 }
 
-.counter-reasons .is-good svg {
+.pick-reasons .is-good svg {
   color: var(--success);
 }
 
-.counter-reasons .is-bad {
+.pick-reasons .is-bad {
   color: var(--text-3);
 }
 
-.counter-reasons .is-bad svg {
+.pick-reasons .is-bad svg {
   color: var(--ruby-strong);
 }
 
-.counter-fit {
+.fit-badge {
   padding: 2px var(--space-2);
   border: 1px solid var(--line-strong);
   color: var(--text-3);
@@ -398,33 +457,53 @@
   white-space: nowrap;
 }
 
-.fit-strong .counter-fit {
+.fit-strong .fit-badge {
   border-color: rgb(111 207 151 / 0.4);
   color: var(--success);
 }
 
-.fit-good .counter-fit {
+.fit-good .fit-badge {
   color: var(--text);
 }
 
+.fit-countered .fit-badge {
+  border-color: color-mix(in srgb, var(--ruby-strong) 45%, transparent);
+  color: var(--ruby-strong);
+}
+
 @media (max-width: 520px) {
-  .counter-row {
+  .lane-row {
     grid-template-columns: 40px minmax(0, 1fr);
   }
 
-  .counter-rank {
-    display: none;
+  .lane-seat {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding-top: 0;
   }
 
-  .counter-row .hero-portrait {
+  .lane-row .hero-portrait {
     width: 40px;
     height: 40px;
   }
 
-  .counter-fit {
+  .fit-badge {
     grid-column: 2;
     justify-self: start;
   }
+}
+
+.comp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
 }
 
 .threats {
@@ -461,11 +540,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-
-.prep-links {
-  display: grid;
-  gap: var(--space-3);
 }
 
 /* ---------- Room cards (Games hub) ---------- */

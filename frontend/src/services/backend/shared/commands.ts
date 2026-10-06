@@ -117,6 +117,12 @@ export function toCommand(action: SiteAction): Command | null {
       return command('join_room', { p_game: action.game }, 'rooms')
     case 'room/leave':
       return command('leave_room', { p_game: action.game }, 'rooms')
+    case 'room/setPreferences':
+      return command(
+        'set_room_preferences',
+        { p_game: action.game, p_role: action.role, p_picks: action.picks },
+        'rooms',
+      )
     case 'room/setStart':
       return command('set_room_start', { p_game: action.game, p_starts_at: action.startsAt }, 'rooms')
     case 'room/pickEnemy':
@@ -125,6 +131,8 @@ export function toCommand(action: SiteAction): Command | null {
       return command('unpick_enemy', { p_game: action.game, p_hero: action.hero }, 'rooms')
     case 'room/clearPicks':
       return command('clear_enemy_picks', { p_game: action.game }, 'rooms')
+    case 'room/setLineup':
+      return command('set_room_lineup', { p_game: action.game, p_lineup: action.lineup }, 'rooms')
     case 'room/reset':
       return command('reset_room', { p_game: action.game }, 'rooms')
   }

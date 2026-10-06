@@ -41,7 +41,8 @@ function soon(): string {
 
 function roomWith(names: string[], startsAt: string | null): GameRoom {
   const joinedAt = new Date().toISOString()
-  return { ...createRoom(), startsAt, members: names.map(name => ({ id: `seed-${name}`, name, joinedAt })) }
+  const members = names.map(name => ({ id: `seed-${name}`, name, joinedAt, role: null, picks: [] }))
+  return { ...createRoom(), startsAt, members }
 }
 
 /**

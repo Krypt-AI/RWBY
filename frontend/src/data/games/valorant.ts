@@ -11,6 +11,7 @@ export const VALORANT: GameGuide = {
   name: 'Valorant',
   shortName: 'Valorant',
   genre: '5v5 tactical shooter',
+  characterTerm: { one: 'agent', many: 'agents' },
   accent: 'ruby',
   tagline: 'Patch 13.06 adds the Warden rifle. Ranked favours Clove and Neon, while pros still put Omen on almost every map.',
   patch: '13.06',

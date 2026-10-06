@@ -99,15 +99,21 @@ export type RoomMember = {
   id: string
   name: string
   joinedAt: string
+  /** The GameRole id they play, or null while they fill whatever the squad needs. */
+  role: string | null
+  /** Heroes or agents they'd like to play, most wanted first. */
+  picks: string[]
 }
 
-/** The lobby for one game: who's in, when the squad starts and the enemy draft. */
+/** The lobby for one game: who's in and what they play, when the squad starts and the enemy draft. */
 export type GameRoom = {
   members: RoomMember[]
   /** Planned start time, or null until a member sets one. */
   startsAt: string | null
   /** Enemy heroes entered in the counter-pick helper, in pick order. */
   enemyPicks: string[]
+  /** The guide lineup the squad settled on, by name (a Valorant map's comp). Null shows the first one. */
+  lineup: string | null
 }
 
 export type SiteState = {

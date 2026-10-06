@@ -1,4 +1,4 @@
-import type { GameId } from '../lib/types'
+import type { GameId, RoomMember } from '../lib/types'
 import { ROOM_SIZE } from '../lib/rooms'
 import { useMode } from './useMode'
 import { useSite } from './useSite'
@@ -24,6 +24,11 @@ export function useGameRoom(game: GameId) {
     if (isMember) dispatch({ type: 'room/leave', game, memberId: viewer.id })
   }
 
+  /** The viewer's own role and favourites. Only people in the room have them. */
+  const setPreferences = (preferences: Pick<RoomMember, 'role' | 'picks'>) => {
+    if (isMember) dispatch({ type: 'room/setPreferences', game, memberId: viewer.id, ...preferences })
+  }
+
   const setStart = (startsAt: string | null) => {
     if (canEdit) dispatch({ type: 'room/setStart', game, startsAt })
   }
@@ -40,6 +45,10 @@ export function useGameRoom(game: GameId) {
     if (canEdit) dispatch({ type: 'room/clearPicks', game })
   }
 
+  const setLineup = (lineup: string | null) => {
+    if (canEdit) dispatch({ type: 'room/setLineup', game, lineup })
+  }
+
   const reset = () => moderate({ type: 'room/reset', game })
 
   return {
@@ -50,10 +59,12 @@ export function useGameRoom(game: GameId) {
     canEdit,
     join,
     leave,
+    setPreferences,
     setStart,
     pickEnemy,
     unpickEnemy,
     clearPicks,
+    setLineup,
     reset,
   }
 }

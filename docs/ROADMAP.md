@@ -5,14 +5,16 @@ what "done" means and which decisions it needs first.
 
 ## Where things stand (2026-10-06)
 
-- Built and working locally: game guides with live MLBB stats, game rooms with a start-time countdown and an MLBB
-  counter-pick helper, the seasonal anime poll, the squad board, music, the live stream page and votes.
+- Built and working locally: game guides with live MLBB stats, game rooms with a start-time countdown, each
+  member's role and favourites, and a recommended lineup (counter-aware for MLBB, by map for Valorant), the seasonal
+  anime poll, the squad board, music, the live stream page and votes.
 - Built: the shared backend (Stage 2). The Supabase schema, security, API functions, realtime and seed live in
-  `database/`, with 35 backend tests in `backend/`. The site uses it once `VITE_SUPABASE_URL` and
+  `database/`, with 38 backend tests in `backend/`. The site uses it once `VITE_SUPABASE_URL` and
   `VITE_SUPABASE_PUBLISHABLE_KEY` are set, and runs as the local demo, with data in the browser, without them.
 - Live: [rwby-red.vercel.app](https://rwby-red.vercel.app) deploys every push to `main` and runs on the hosted
-  Supabase project, with Discord sign-in. One migration is still to apply there:
-  `20261006000800_seed_without_sample_squads.sql` (`npx supabase db push` in `database/`, never `--include-seed`).
+  Supabase project, with Discord sign-in. Migrations through `20261006000900_room_preferences.sql` are applied there.
+  Apply `20261006001000_room_lineup_choice.sql` (`npx supabase db push` in `database/`, never `--include-seed`)
+  before the room lineups reach `main`: that frontend reads `game_rooms.lineup`, and the site can't load without it.
 - No frontend unit tests, lint or CI yet.
 
 ## Stage 1: Ship what's built (small)
@@ -34,7 +36,7 @@ what "done" means and which decisions it needs first.
 
 **Decided 2026-10-06:** Supabase, with Discord sign-in.
 
-- [ ] **2a. Safety net:** the backend tests are done (35 in `backend/`, on the real migrations). Still to do: Vitest
+- [ ] **2a. Safety net:** the backend tests are done (38 in `backend/`, on the real migrations). Still to do: Vitest
   tests for the reducer, counter scoring, room phases and season maths; ESLint and Prettier; optionally CI on pull
   requests.
 - [x] **2b.** Schema and row-level security in [database/](../database/README.md), including the room tables: 5 seats,
@@ -67,11 +69,14 @@ is still to do.
 ## Stage 4: Rooms and draft v2 (medium, needs Stage 2)
 
 - [ ] **4a. Full draft board:** ally picks and bans (both dropped from suggestions), team synergy from Moonton's
-  "pairs well with" data, and hints when the team is missing a role.
+  "pairs well with" data.
 - [ ] **4b.** An optional shared draft pick timer, alongside the start-time countdown.
 - [ ] **4c.** Rooms opened from squad posts (several per game), a ready check and room chat.
 - [ ] **4d.** Reminders before the start time through a Discord webhook or browser notifications, plus a calendar
   (.ics) export.
+- [x] **4e. Lineups built around the squad:** room members choose a role and up to three favourites. MLBB recommends
+  one hero per lane, re-ranked against the enemy draft; Valorant seats the squad in the meta comp for the map the
+  room picks.
 
 ## Stage 5: Polish and launch (small to medium)
 

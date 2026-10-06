@@ -1,30 +1,34 @@
-import type { DraftHero, DraftKit, HeroClass, LiveRates, MatchupStat, Threat, Tier } from '../data/games/types'
+import type { DraftHero, DraftKit, HeroClass, MatchupStat, Threat, Tier } from '../data/games/types'
 
-/** 'strong': a clear edge on several fronts. 'situational': a small edge, check your comp first. */
-export type Fit = 'strong' | 'good' | 'situational'
+/** How a hero's matchups against the enemy draft add up. */
+export type Fit = 'strong' | 'good' | 'even' | 'countered'
 
-type Reason = { tone: 'good' | 'bad'; text: string }
+export type Reason = { tone: 'good' | 'bad'; text: string }
 
-type CounterSuggestion = { hero: DraftHero; score: number; fit: Fit; reasons: Reason[] }
-
-type CounterInput = {
-  pool: DraftHero[]
+/** The enemy draft and this patch's numbers, which every hero is rated against. */
+export type DraftContext = {
   enemies: DraftHero[]
   /** Live best and worst picks against each enemy, keyed by enemy id. */
   matchups?: Map<number, MatchupStat[]>
-  /** Live overall rates, keyed by hero name. */
-  rates?: Map<string, LiveRates>
+  /** Overall win rates in percent, keyed by hero name: live when the feed is up, else the patch snapshot. */
+  winRates?: Map<string, number>
   /** Curated tier placements, keyed by hero name. */
   tiers?: Map<string, Tier>
-  /** Only suggest heroes played in this lane. */
-  lane?: string
-  limit?: number
+}
+
+export type HeroRating = {
+  /** Win-rate points gained or lost against the enemy draft. */
+  edge: number
+  /** Strength on this patch, from the live win rate and the tier list. */
+  form: number
+  /** Strengths first, then warnings. */
+  reasons: Reason[]
 }
 
 /**
  * What each signal is worth, in win-rate points. Being on Moonton's official counter list
- * counts like a 2-point matchup edge. Overall form only breaks ties: a hero needs a real
- * edge against the enemy draft to be suggested at all.
+ * counts like a 2-point matchup edge. Overall form is worth less than a real matchup edge,
+ * so it mostly decides between heroes that match up equally.
  */
 const WEIGHTS = { listedCounter: 2, listedWeakness: -2, matchupPoint: 1, winRatePoint: 0.25 }
 const TIER_BONUS: Partial<Record<Tier, number>> = { S: 1, A: 0.5 }
@@ -33,12 +37,15 @@ const NOTABLE_WIN_RATE_GAP = 2
 
 const signed = (points: number) => `${points >= 0 ? '+' : '−'}${Math.abs(points).toFixed(1)}%`
 
-function fitFor(edge: number): Fit {
+/** One official counter is a good answer, two are a strong one; one official weakness is a real risk. */
+export function fitFor(edge: number): Fit {
   if (edge >= 4) return 'strong'
-  return edge >= 2 ? 'good' : 'situational'
+  if (edge >= 2) return 'good'
+  return edge > -2 ? 'even' : 'countered'
 }
 
-function scoreHero(hero: DraftHero, { enemies, matchups, rates, tiers }: CounterInput): CounterSuggestion | null {
+/** Rates one hero against the enemy draft and the current patch. */
+export function rateHero(hero: DraftHero, { enemies, matchups, winRates, tiers }: DraftContext): HeroRating {
   let edge = 0
   const reasons: Reason[] = []
 
@@ -58,10 +65,8 @@ function scoreHero(hero: DraftHero, { enemies, matchups, rates, tiers }: Counter
     }
   }
 
-  if (edge <= 0) return null
-
   let form = 0
-  const winRate = rates?.get(hero.name)?.winRate
+  const winRate = winRates?.get(hero.name)
   if (winRate !== undefined) {
     form += (winRate - 50) * WEIGHTS.winRatePoint
     if (Math.abs(winRate - 50) >= NOTABLE_WIN_RATE_GAP) {
@@ -77,21 +82,7 @@ function scoreHero(hero: DraftHero, { enemies, matchups, rates, tiers }: Counter
 
   // Strengths first, warnings after; the order within each group follows the enemy picks.
   reasons.sort((a, b) => Number(a.tone === 'bad') - Number(b.tone === 'bad'))
-  return { hero, score: edge + form, fit: fitFor(edge), reasons }
-}
-
-/** The best answers to the enemy picks, strongest first. */
-export function suggestCounters(input: CounterInput): CounterSuggestion[] {
-  const { pool, enemies, lane, limit = 6 } = input
-  if (enemies.length === 0) return []
-  const taken = new Set(enemies.map(enemy => enemy.id))
-
-  return pool
-    .filter(hero => !taken.has(hero.id) && (!lane || hero.lanes.includes(lane)))
-    .map(hero => scoreHero(hero, input))
-    .filter((suggestion): suggestion is CounterSuggestion => suggestion !== null)
-    .sort((a, b) => b.score - a.score || a.hero.name.localeCompare(b.hero.name))
-    .slice(0, limit)
+  return { edge, form, reasons }
 }
 
 type ThreatRead = { threat: Threat; heroes: string[] }

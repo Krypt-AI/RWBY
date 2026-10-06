@@ -6,6 +6,9 @@ export const ROOM_SIZE = 5
 /** One pick per enemy player. */
 export const ENEMY_PICK_LIMIT = 5
 
+/** Heroes or agents each member can name as favourites. */
+export const FAVOURITE_LIMIT = 3
+
 /** The last stretch before the start, when the room asks everyone to get in. */
 const STARTING_SOON_MS = 5 * 60_000
 
@@ -15,7 +18,7 @@ const SESSION_MS = 3 * 3_600_000
 export type RoomPhase = 'unscheduled' | 'upcoming' | 'starting' | 'inGame' | 'ended'
 
 export function createRoom(): GameRoom {
-  return { members: [], startsAt: null, enemyPicks: [] }
+  return { members: [], startsAt: null, enemyPicks: [], lineup: null }
 }
 
 export function roomPhase(startsAt: string | null, now: number): RoomPhase {

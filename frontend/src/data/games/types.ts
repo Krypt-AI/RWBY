@@ -35,7 +35,7 @@ export type TierEntry = {
   trend?: 'up' | 'down'
 }
 
-type LineupSlot = { name: string; roleId: string }
+export type LineupSlot = { name: string; roleId: string }
 
 export type Lineup = {
   name: string
@@ -93,6 +93,14 @@ export type DraftHero = {
   counteredBy: number[]
 }
 
+/** A hero or agent a room member can name as a favourite. */
+export type Character = {
+  name: string
+  portrait?: string
+  /** GameRole ids it's played in. */
+  roleIds: string[]
+}
+
 /** Something in the enemy draft that a build should answer. */
 export type Threat = 'healing' | 'magic' | 'physical' | 'dive' | 'control'
 
@@ -110,6 +118,8 @@ export type GameGuide = {
   name: string
   shortName: string
   genre: string
+  /** What the game calls its characters, e.g. hero and heroes. */
+  characterTerm: { one: string; many: string }
   accent: Accent
   tagline: string
   patch: string

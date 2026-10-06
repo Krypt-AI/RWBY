@@ -1229,7 +1229,7 @@ input[type='datetime-local'] {
   transition: color var(--duration), border-color var(--duration), background var(--duration);
 }
 
-.chip:hover {
+.chip:hover:not(:disabled) {
   color: var(--text);
   border-color: var(--text-3);
 }
@@ -1238,6 +1238,15 @@ input[type='datetime-local'] {
   color: var(--text);
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* Read-only chips still show the current choice; the rest fade back. */
+.chip:disabled {
+  cursor: default;
+}
+
+.chip:disabled:not([aria-pressed='true']) {
+  opacity: 0.5;
 }
 
 .tag {

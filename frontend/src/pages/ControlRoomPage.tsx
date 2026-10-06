@@ -122,6 +122,7 @@ export function ControlRoomPage() {
             {GAMES.map(game => {
               const room = rooms[game.id]
               const pill = ROOM_PILL[roomPhase(room.startsAt, Date.now())]
+              const plan = game.draft ? `${room.enemyPicks.length} enemy picks` : (room.lineup ?? 'No map chosen')
               return (
                 <li key={game.id} className={`accent-${game.accent}`}>
                   <span className="control-table-name">
@@ -129,7 +130,7 @@ export function ControlRoomPage() {
                     <b>{room.startsAt ? formatSessionDate(room.startsAt) : 'No start time'}</b>
                   </span>
                   <span className="control-table-count">
-                    {room.members.length}/{ROOM_SIZE} in the room · {room.enemyPicks.length} enemy picks
+                    {room.members.length}/{ROOM_SIZE} in the room · {plan}
                   </span>
                   <StatusPill tone={pill.tone} label={pill.label} />
                   <button

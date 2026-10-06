@@ -1,7 +1,8 @@
 # RWBY Afterlight
 
 A fan-run, RWBY-themed friends community: game guides with live MLBB stats (MLBB, Valorant), game rooms with
-a start-time countdown and an MLBB counter-pick helper, a squad finder, a shared music playlist, a live stream and
+a start-time countdown and a recommended five-player lineup built around each member's role and favourites
+(counter-aware for MLBB, by map for Valorant), a squad finder, a shared music playlist, a live stream and
 community votes, including a seasonal anime poll.
 
 ## Project structure
@@ -92,7 +93,8 @@ things back. How it works, and what each role may do: [backend/README.md](backen
 - **Visitors** can read everything. Trying to take part opens a "sign in with Discord" prompt.
 - **Members** (signed in): chat, vote (one vote per poll, changeable while open), RSVP,
   post and join squads (and close your own posts), add and like songs, and join a game room (five seats).
-  Room members set the start time and enter the enemy picks for the MLBB counter helper.
+  Room members choose their own role and up to three favourites, set the start time, and enter the enemy picks
+  for the MLBB lineup or pick the map for Valorant.
   Your Discord name is your display name; change it from the account button in the sidebar.
 - **Moderators**: everything a member can do, plus gold-marked controls on each page.
   Moderators can go live or end the stream, set the YouTube/Twitch link, pin or delete chat messages,
@@ -119,16 +121,33 @@ it stops answering, the guide falls back to its dated snapshot and says so.
 Valorant has no public stats API that a browser can call, so its guide shows the patch snapshot plus links to live
 stat pages (`liveLinks` in the game file). Feeds are registered per game in `frontend/src/services/liveStats.ts`.
 
-## Game rooms and counter picks
+## Game rooms and lineups
 
 Each game has a room at `/games/:game/room`: five seats, a start time with a live countdown (quick picks of
-+15 min, +30 min and +1 hr, or any date and time), and for MLBB a counter-pick helper. Room members enter the
-enemy picks; suggestions re-rank after each pick using this week's matchup stats from Rone Arena (how much each
-hero moves win rate against each enemy) plus Moonton's official counter list. Overall win rate and tier only break
-ties. The helper also reads the enemy draft for healing, dive, magic, physical and crowd-control threats and lists
-items that answer them. The scoring lives in `frontend/src/lib/counterPicks.ts`.
++15 min, +30 min and +1 hr, or any date and time), and a recommended lineup. Everyone in the room can choose
+their role (or Fill) and up to three favourite heroes or agents, and the roster shows what each member plays.
 
-If the matchup stats can't be reached, suggestions come from Moonton's official counter relations, bundled in
+**MLBB: a recommended lineup, one hero per lane.** Members who chose a lane get it, first to join first; everyone
+else fills an open lane, preferably one their favourites play. Each lane then gets its best hero:
+
+- Open lanes take this patch's strongest pick: live win rate plus tier (the patch snapshot's win rates when the
+  feed is down). With nobody in the room, that's the meta lineup.
+- A member's lane takes their favourites first, because comfort beats the meta. A favourite only sits out when an
+  enemy pick counters it (an official weakness, or a clearly bad live matchup), and then their next favourite comes
+  in before any other hero. Among favourites the better matchup wins, and their order settles near-ties. The lane
+  says why a top favourite sits out, and the strongest counters still show as alternatives.
+- As the enemy picks are entered, every lane re-ranks using this week's matchup stats from Rone Arena (how much each
+  hero moves win rate against each enemy) plus Moonton's official counter list. No hero is used twice.
+
+Each lane shows its reasons, a counter rating and two alternatives. The helper also reads the enemy draft for
+healing, dive, magic, physical and crowd-control threats and lists items that answer them. Hero scoring lives in
+`frontend/src/lib/counterPicks.ts`, and seating and the lineup in `frontend/src/lib/lineupPlanner.ts`.
+
+**Valorant: lineups by map.** The room shows the guide's meta comp for each map (`lineups` in the game file). A room
+member picks the map you landed on, and everyone in the room sees the same comp. The squad takes its slots by
+favourite agent first, then by role, then whoever is left fills. The map that suits the squad best is marked.
+
+If the matchup stats can't be reached, counters come from Moonton's official counter relations, bundled in
 `frontend/src/data/games/mlbbHeroes.ts`. Regenerate that snapshot when a patch lands:
 
 ```bash
@@ -156,9 +175,10 @@ Both were taken on 2026-10-05. When a patch lands, edit the tiers, lineups, buil
 and update `sources`. Leave out any rate the sources don't publish, and the tier list shows a dash.
 To add a game, create a new file with the `GameGuide` shape (`data/games/types.ts`), add its id to `GameId`
 in `lib/types.ts`, give it a room in the seed (`lib/seed.ts`), and register it in `data/games/index.ts`.
-For the shared backend, add a migration that extends the `game_id` type, allows it in `lfg_posts.game` and inserts
-its `game_rooms` row, and add the room to `private.seed_site()`.
-The hub, routes and squad board pick it up automatically. A `draft` kit adds the counter helper to its room.
+For the shared backend, add a migration that extends the `game_id` type, allows it in `lfg_posts.game`, inserts
+its `game_rooms` row and adds its role ids to `private.room_roles()`, and add the room to `private.seed_site()`.
+The hub, routes and squad board pick it up automatically. A `draft` kit gives its room the counter-aware lineup;
+without one, the room shows the guide's lineups.
 
 ## Frontend layout
 
@@ -170,7 +190,7 @@ frontend/src/
   pages/             one file per route
   components/        UI building blocks (poll, chat, player, schedule, editors...)
     games/           tier list, live stats bar and leaderboard, lineups, builds, roles, game cards
-    rooms/           game room: lobby, countdown, roster, enemy draft, counter suggestions
+    rooms/           game room: lobby, countdown, roster, role and favourites, enemy draft, lineups
     anime/           seasonal anime poll card and moderator controls
     squad/           LFG card and form
     music/           playlist embed and song queue
@@ -178,7 +198,7 @@ frontend/src/
   data/anime/        curated seasonal lineups
   hooks/             useSite, useMode, useViewer, useAccount, useNotice, usePoll, useLfg, useTracks,
                      useGameRoom, useLiveStats, useMatchups, useSeasonalPoll, useNow
-  lib/               types, seed data, reducer, context providers, rooms, seasons, counter-pick scoring
+  lib/               types, seed data, reducer, context providers, rooms, seasons, counter scoring, lineup planner
   services/backend/  data access: the Supabase backend, or the local demo (see backend/README.md)
   services/          also browser storage, live stats feeds, anime lineup source
   utils/             formatting, ids, caching, YouTube/Twitch embed parsing

@@ -6,10 +6,12 @@ type ChipGroupProps = {
   options: ChipOption[]
   isSelected: (value: string) => boolean
   onSelect: (value: string) => void
+  /** Shows the choice without letting the viewer change it. */
+  disabled?: boolean
 }
 
 /** A row of toggle chips. Works for single-choice filters and multi-select fields. */
-export function ChipGroup({ label, options, isSelected, onSelect }: ChipGroupProps) {
+export function ChipGroup({ label, options, isSelected, onSelect, disabled = false }: ChipGroupProps) {
   return (
     <div className="chip-group" role="group" aria-label={label}>
       {options.map(option => (
@@ -18,6 +20,7 @@ export function ChipGroup({ label, options, isSelected, onSelect }: ChipGroupPro
           type="button"
           className="chip"
           aria-pressed={isSelected(option.value)}
+          disabled={disabled}
           onClick={() => onSelect(option.value)}
         >
           {option.label}

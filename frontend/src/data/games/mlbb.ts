@@ -12,6 +12,7 @@ export const MLBB: GameGuide = {
   name: 'Mobile Legends: Bang Bang',
   shortName: 'MLBB',
   genre: '5v5 mobile MOBA',
+  characterTerm: { one: 'hero', many: 'heroes' },
   accent: 'yang',
   tagline: 'Season 42 rewards durable frontliners and sustain supports. Matches run slower and the economy punishes snowballing.',
   patch: '2.2.16',

@@ -15,7 +15,7 @@ import type {
 } from './types'
 import { createSeedState } from './seed'
 import { SEASONAL_CATEGORY } from './categories'
-import { createRoom, ENEMY_PICK_LIMIT, ROOM_SIZE } from './rooms'
+import { createRoom, ENEMY_PICK_LIMIT, FAVOURITE_LIMIT, ROOM_SIZE } from './rooms'
 import { createId } from '../utils/id'
 
 const MAX_CHAT_MESSAGES = 200
@@ -51,12 +51,14 @@ export type SiteAction =
   | { type: 'track/add'; track: Omit<Track, 'likes' | 'at'> }
   | { type: 'track/like'; id: string; liking: boolean }
   | { type: 'track/remove'; id: string }
-  | { type: 'room/join'; game: GameId; member: Omit<RoomMember, 'joinedAt'> }
+  | { type: 'room/join'; game: GameId; member: Pick<RoomMember, 'id' | 'name'> }
   | { type: 'room/leave'; game: GameId; memberId: string }
+  | ({ type: 'room/setPreferences'; game: GameId; memberId: string } & Pick<RoomMember, 'role' | 'picks'>)
   | { type: 'room/setStart'; game: GameId; startsAt: string | null }
   | { type: 'room/pickEnemy'; game: GameId; hero: string }
   | { type: 'room/unpickEnemy'; game: GameId; hero: string }
   | { type: 'room/clearPicks'; game: GameId }
+  | { type: 'room/setLineup'; game: GameId; lineup: string | null }
   | { type: 'room/reset'; game: GameId }
 
 function step(value: number, up: boolean): number {
@@ -194,12 +196,22 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
       return updateRoom(state, action.game, room => {
         const inRoom = room.members.some(member => member.id === action.member.id)
         if (inRoom || room.members.length >= ROOM_SIZE) return room
-        return { ...room, members: [...room.members, { ...action.member, joinedAt: new Date().toISOString() }] }
+        const member = { ...action.member, joinedAt: new Date().toISOString(), role: null, picks: [] }
+        return { ...room, members: [...room.members, member] }
       })
     case 'room/leave':
       return updateRoom(state, action.game, room => ({
         ...room,
         members: room.members.filter(member => member.id !== action.memberId),
+      }))
+    case 'room/setPreferences':
+      return updateRoom(state, action.game, room => ({
+        ...room,
+        members: room.members.map(member =>
+          member.id === action.memberId
+            ? { ...member, role: action.role, picks: [...new Set(action.picks)].slice(0, FAVOURITE_LIMIT) }
+            : member,
+        ),
       }))
     case 'room/setStart':
       return updateRoom(state, action.game, room => ({ ...room, startsAt: action.startsAt }))
@@ -215,6 +227,8 @@ export function siteReducer(state: SiteState, action: SiteAction): SiteState {
       }))
     case 'room/clearPicks':
       return updateRoom(state, action.game, room => ({ ...room, enemyPicks: [] }))
+    case 'room/setLineup':
+      return updateRoom(state, action.game, room => ({ ...room, lineup: action.lineup }))
     case 'room/reset':
       return updateRoom(state, action.game, () => createRoom())
   }

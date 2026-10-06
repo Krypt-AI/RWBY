@@ -24,10 +24,12 @@ type ViewerAction = Extract<
       | 'track/like'
       | 'room/join'
       | 'room/leave'
+      | 'room/setPreferences'
       | 'room/setStart'
       | 'room/pickEnemy'
       | 'room/unpickEnemy'
       | 'room/clearPicks'
+      | 'room/setLineup'
   }
 >
 
