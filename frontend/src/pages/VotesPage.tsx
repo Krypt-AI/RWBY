@@ -22,12 +22,13 @@ interface TeamMember {
 
 /**
  * The art beside each poll: Team RWBY in a line, with one member lit and the rest of the team
- * cast in the category's accent (see .lineup-card). Weiss gets music because she's the team's singer.
+ * cast in the category's accent (see .lineup-card). Members follow the tab order (CATEGORIES), so
+ * stepping through the tabs walks the light along the line: Ruby, Weiss, Blake, then Yang.
  */
 const CATEGORY_MEMBER: Record<Category, TeamMember> = {
-  game: { name: 'Blake', x: 358, effect: 'slivers' },
+  game: { name: 'Ruby', x: 135, effect: 'petals' },
   music: { name: 'Weiss', x: 248, effect: 'snow' },
-  anime: { name: 'Ruby', x: 135, effect: 'petals' },
+  anime: { name: 'Blake', x: 358, effect: 'slivers' },
   movie: { name: 'Yang', x: 475, effect: 'embers' },
 }
 
