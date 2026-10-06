@@ -13,7 +13,9 @@ import { EmblemStripe } from '../components/Wordmark'
 import { GameCard } from '../components/games/GameCard'
 import { TrackQueue } from '../components/music/TrackQueue'
 import { LfgCard } from '../components/squad/LfgCard'
-import teamArt from '../assets/images/RWBY3.jpg'
+import { CONTENT_WIDTH_SIZES } from '../layout/imageSizes'
+import teamArt from '../assets/images/home-2560.webp'
+import teamArtSmall from '../assets/images/home-1280.webp'
 
 const LATEST_SQUADS = 2
 const TOP_TRACKS = 4
@@ -24,7 +26,13 @@ export function HomePage() {
   return (
     <div className="page home">
       <section className="hero">
-        <img className="hero-art" src={teamArt} alt="Ruby, Weiss, Blake and Yang side by side, each behind her initial" />
+        <img
+          className="hero-art"
+          src={teamArt}
+          srcSet={`${teamArtSmall} 1280w, ${teamArt} 2560w`}
+          sizes={CONTENT_WIDTH_SIZES}
+          alt="Ruby, Weiss, Blake and Yang in four close-up panels"
+        />
         <ArtEffect kind="dust" className="hero-art-effect" />
         <div className="hero-copy">
           <p className="eyebrow">

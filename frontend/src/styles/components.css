@@ -137,33 +137,29 @@
 }
 
 /*
- * Art drawn on black can fill the whole header instead (is-fill). "lighten" lets its black take
- * on the panel colour, so the art has no visible edges; on wide screens it covers the box and the
- * copy sits over it at the bottom left, on a scrim that settles the art into the panel there.
+ * Fill art (is-fill) covers the whole header on wide screens, with the copy over it at the bottom
+ * left on a scrim of its own. Narrow screens show it like any other header art, above the copy.
  */
-.page-header-art.is-fill,
-.page-header-effect.is-fill {
-  mask-image: none;
-  -webkit-mask-image: none;
-}
-
-.page-header-art.is-fill {
-  mix-blend-mode: lighten;
-}
-
 @media (min-width: 721px) {
   .page-header.has-art.is-fill {
-    min-height: 300px;
+    min-height: 340px;
   }
 
   .page-header-art.is-fill,
   .page-header-effect.is-fill {
     width: 100%;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  /* Only a light settle along the bottom edge: the copy brings its own scrim. */
+  .page-header.has-art.is-fill::after {
+    background: linear-gradient(0deg, var(--bg-raised), transparent 18%);
   }
 
   /*
    * The scrim follows the copy: it settles the art into the panel under the text and fades out
-   * above and to the right of it, so the silhouettes' heads and the rest of the lineup stay vivid.
+   * just above and to the right of it, so the faces around it stay vivid.
    */
   .page-header.is-fill .page-header-copy {
     position: relative;
@@ -173,15 +169,15 @@
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -6rem -14rem calc(-1 * var(--space-6)) calc(-1 * var(--space-6));
+    inset: -4rem -8rem calc(-1 * var(--space-6)) calc(-1 * var(--space-6));
     background: linear-gradient(
       0deg,
       var(--bg-raised),
-      color-mix(in srgb, var(--bg-raised) 88%, transparent) calc(100% - 6rem),
+      color-mix(in srgb, var(--bg-raised) 88%, transparent) calc(100% - 4rem),
       transparent
     );
-    mask-image: linear-gradient(90deg, #000 calc(100% - 14rem), transparent);
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14rem), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 8rem), transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 8rem), transparent);
     pointer-events: none;
   }
 
@@ -231,17 +227,6 @@
 
   .page-header-art {
     object-position: var(--art-position-narrow, var(--art-position, center));
-  }
-
-  /* Fill art fits whole in the room above the copy (its black needs no fade), so it never runs behind the text. */
-  .page-header-art.is-fill,
-  .page-header-effect.is-fill {
-    height: 164px;
-  }
-
-  .page-header-art.is-fill {
-    object-fit: contain;
-    object-position: center top;
   }
 }
 

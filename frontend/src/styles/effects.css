@@ -47,34 +47,32 @@
 /* ---------- Team RWBY: an Aura roll call (Squad) ---------- */
 /*
  * Like a party's ready check: every few seconds Ruby, Weiss, Blake and Yang flare with their Aura,
- * one after another. Each glow sits on its member's panel in RWBY1.jpg (597 × 335), which fills the
- * Squad header's width (.page-header-art.is-fill). "screen" only ever adds light, so the
- * silhouettes glow instead of being painted over.
+ * one after another, each glow behind her in SquadUp.jpg. The positions are where each fighter
+ * sits in the header: wide headers show the picture's middle band (framed at "center 40%"),
+ * narrow ones its whole height. "screen" only ever adds light, so the fighters glow instead of
+ * being painted over.
  */
 .art-effect.is-aura {
   mix-blend-mode: screen;
 }
 
 .art-effect.is-aura i {
-  /* The picture's width, where its left edge sits in the layer, and the panel's centre across it. */
-  --art-width: 100cqw;
-  --art-left: 0px;
-  --panel: 0.144;
   --aura: var(--ruby);
-  top: 0;
-  left: calc(var(--art-left) + var(--panel) * var(--art-width));
-  width: calc(var(--art-width) * 0.3);
-  height: 100%;
-  margin-left: calc(var(--art-width) * -0.15);
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--aura) 75%, transparent), transparent);
+  left: var(--glow-x);
+  top: var(--glow-y);
+  width: 26%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--aura) 70%, transparent), transparent);
   /* Dark until each member's turn first comes round. */
   opacity: 0;
   animation: aura-flare 9s ease-in-out infinite;
 }
 
-.art-effect.is-aura i:nth-child(2) { --panel: 0.377; --aura: var(--weiss-ice); animation-delay: 0.35s; }
-.art-effect.is-aura i:nth-child(3) { --panel: 0.618; --aura: var(--blake); animation-delay: 0.7s; }
-.art-effect.is-aura i:nth-child(4) { --panel: 0.854; --aura: var(--yang); animation-delay: 1.05s; }
+.art-effect.is-aura i:nth-child(1) { --glow-x: 35%; --glow-y: 40%; }
+.art-effect.is-aura i:nth-child(2) { --glow-x: 66%; --glow-y: 49%; --aura: var(--weiss-ice); animation-delay: 0.35s; }
+.art-effect.is-aura i:nth-child(3) { --glow-x: 84%; --glow-y: 86%; --aura: var(--blake); animation-delay: 0.7s; }
+.art-effect.is-aura i:nth-child(4) { --glow-x: 87%; --glow-y: 22%; --aura: var(--yang); animation-delay: 1.05s; }
 
 @keyframes aura-flare {
   0%, 100% { opacity: 0; }
@@ -82,12 +80,11 @@
   22% { opacity: 0; }
 }
 
-/* Narrow headers show the picture whole, at the layer's height, centred above the copy. */
 @media (max-width: 720px) {
-  .art-effect.is-aura i {
-    --art-width: calc(100cqh * 597 / 335);
-    --art-left: calc((100cqw - var(--art-width)) / 2);
-  }
+  .art-effect.is-aura i:nth-child(1) { --glow-x: 31%; --glow-y: 40%; }
+  .art-effect.is-aura i:nth-child(2) { --glow-x: 67%; --glow-y: 45%; }
+  .art-effect.is-aura i:nth-child(3) { --glow-x: 87%; --glow-y: 66%; }
+  .art-effect.is-aura i:nth-child(4) { --glow-x: 90%; --glow-y: 30%; }
 }
 
 /* ---------- Weiss: snowfall, with a few crystal flakes among the soft ones (Music) ---------- */

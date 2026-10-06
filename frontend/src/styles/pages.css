@@ -40,10 +40,10 @@
 
 /* ---------- Home: hero ---------- */
 /*
- * RWBY3.jpg is 508 × 393, and the picture is the band from y 88 to 305 between black bars.
- * Stacked (phones, tablets, narrow windows): the band spans the top edge to edge, bars cropped
- * off, and settles behind the copy. Wide screens make it a poster (see the media query below).
- * Throughout, "lighten" lets the art's black take on the panel colour.
+ * Home.jpg (16:9): the team in four close-up panels of equal width, the eyes between 30% and 47%
+ * of its height and the mouths near 53%. Stacked (phones, tablets, narrow windows): the picture
+ * spans the top edge to edge and settles behind the copy. Wide screens make it a poster (see the
+ * media query below).
  */
 .hero {
   position: relative;
@@ -55,24 +55,25 @@
   clip-path: polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 0 100%);
 }
 
+/* On tablets the picture would run taller than 360px; it trims top and bottom, keeping the eyes. */
 .hero-art {
   width: calc(100% + 2 * var(--space-5));
-  aspect-ratio: 508 / 217;
-  max-height: 300px;
+  aspect-ratio: 16 / 9;
+  max-height: 360px;
   margin-inline: calc(-1 * var(--space-5));
   object-fit: cover;
-  mix-blend-mode: lighten;
-  mask-image: linear-gradient(#000 70%, transparent);
-  -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  object-position: center 30%;
+  mask-image: linear-gradient(#000 72%, transparent);
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
 }
 
-/* Dust rises over the band, one member's colour over each panel. */
+/* Dust rises over the picture, one member's colour over each panel. */
 .hero-art-effect {
   inset: 0 0 auto;
-  aspect-ratio: 508 / 217;
-  max-height: 300px;
-  mask-image: linear-gradient(#000 70%, transparent);
-  -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  aspect-ratio: 16 / 9;
+  max-height: 360px;
+  mask-image: linear-gradient(#000 72%, transparent);
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
 }
 
 .hero-copy {
@@ -105,54 +106,45 @@
 }
 
 /*
- * The poster: the band fills the hero, the team's faces along its top, and the copy anchors the
- * bottom edge: the title at the left, the lead and actions at the right on the same baseline. The
- * hero takes the band's proportions (taller when the copy needs it). The image box is the band
- * plus its bars, so the bars always fall outside the hero, and "cover" trims Ruby's and Yang's
- * outer edges when the hero runs taller than the band. Below 1200px that trim would reach their
- * faces, so narrower windows keep the stacked layout.
+ * The poster: the hero takes the picture's own 16:9, so nothing is cropped, and the copy anchors
+ * the bottom edge (the title at the left, the lead and actions at the right on the same baseline),
+ * low enough to leave every pair of eyes clear. Below 1200px the copy would climb over the faces,
+ * so narrower windows keep the stacked layout.
  */
 @media (min-width: 1201px) {
   .hero {
-    aspect-ratio: 508 / 217;
-    min-height: 420px;
+    aspect-ratio: 16 / 9;
+    min-height: 460px;
     align-items: end;
     padding: var(--space-7);
   }
 
-  .hero-art {
+  .hero-art,
+  .hero-art-effect {
     position: absolute;
-    top: calc(-100% * 88 / 217);
-    left: 0;
+    inset: 0;
     width: 100%;
-    height: calc(100% * 393 / 217);
+    height: 100%;
     max-height: none;
     margin: 0;
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-
-  .hero-art-effect {
-    inset: 0;
     aspect-ratio: auto;
-    max-height: none;
     mask-image: none;
     -webkit-mask-image: none;
   }
 
   /*
    * The scrim follows the copy: it settles the art into the panel under the text, whatever the
-   * copy's height, and fades out over the 8rem above it, leaving the faces along the top untouched.
+   * copy's height, and fades out over the 4rem above it, below the eyes.
    */
   .hero-copy::before {
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -8rem calc(-1 * var(--space-7)) calc(-1 * var(--space-7));
+    inset: -4rem calc(-1 * var(--space-7)) calc(-1 * var(--space-7));
     background: linear-gradient(
       0deg,
       var(--bg-raised),
-      color-mix(in srgb, var(--bg-raised) 90%, transparent) calc(100% - 8rem),
+      color-mix(in srgb, var(--bg-raised) 90%, transparent) calc(100% - 4rem),
       transparent
     );
     pointer-events: none;

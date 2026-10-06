@@ -8,7 +8,8 @@ import { PageHeader } from '../components/PageHeader'
 import { EmptyState, ModPanel, Panel } from '../components/Panel'
 import { LfgCard } from '../components/squad/LfgCard'
 import { LfgForm } from '../components/squad/LfgForm'
-import teamArt from '../assets/images/RWBY1.jpg'
+import squadArt from '../assets/images/squad-up-2560.webp'
+import squadArtSmall from '../assets/images/squad-up-1280.webp'
 
 type GameFilter = LfgPost['game'] | 'all'
 
@@ -34,7 +35,13 @@ export function SquadPage() {
         eyebrow="Looking for group"
         title="Squad up"
         lead="Post what you’re queuing for and which roles you need. Friends tap Join to fill the stack."
-        art={{ src: teamArt, fill: true, position: 'center 4%', effect: 'aura' }}
+        art={{
+          src: squadArt,
+          srcSet: `${squadArtSmall} 1280w, ${squadArt} 2560w`,
+          fill: true,
+          position: 'center 40%',
+          effect: 'aura',
+        }}
       />
 
       <div className="split-layout is-wide-main">
