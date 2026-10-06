@@ -40,7 +40,7 @@ export function ControlRoomPage() {
         eyebrow="Moderator"
         title="Control room"
         lead="Everything users see, in one place. Changes go live immediately for every open tab."
-        art={{ src: moonArt, position: 'center 30%' }}
+        art={{ src: moonArt, position: 'center 30%', effect: 'shards' }}
       />
 
       <dl className="stat-row">

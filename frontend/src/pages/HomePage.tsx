@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { CATEGORIES } from '../lib/categories'
 import { GAMES } from '../data/games'
 import { useSite } from '../hooks/useSite'
+import { ArtEffect } from '../components/ArtEffect'
 import { Icon } from '../components/Icon'
 import { EmptyState, ModPanel, Panel } from '../components/Panel'
 import { ScheduleList } from '../components/ScheduleList'
@@ -12,7 +13,7 @@ import { EmblemStripe } from '../components/Wordmark'
 import { GameCard } from '../components/games/GameCard'
 import { TrackQueue } from '../components/music/TrackQueue'
 import { LfgCard } from '../components/squad/LfgCard'
-import teamArt from '../assets/images/RWBY1.jpg'
+import teamArt from '../assets/images/RWBY3.jpg'
 
 const LATEST_SQUADS = 2
 const TOP_TRACKS = 4
@@ -23,12 +24,8 @@ export function HomePage() {
   return (
     <div className="page home">
       <section className="hero">
-        <img className="hero-art" src={teamArt} alt="Silhouettes of Ruby, Weiss, Blake and Yang above their emblems" />
-        <div className="hero-petals" aria-hidden="true">
-          {Array.from({ length: 9 }, (_, i) => (
-            <i key={i} />
-          ))}
-        </div>
+        <img className="hero-art" src={teamArt} alt="Ruby, Weiss, Blake and Yang side by side, each behind her initial" />
+        <ArtEffect kind="dust" className="hero-art-effect" />
         <div className="hero-copy">
           <p className="eyebrow">
             <EmblemStripe /> Fan-run friends community

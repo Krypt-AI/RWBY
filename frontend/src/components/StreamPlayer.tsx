@@ -1,6 +1,7 @@
 import type { Stream } from '../lib/types'
 import { toEmbedUrl } from '../utils/embed'
-import offlinePoster from '../assets/images/RubyRose.jpg'
+import { ArtEffect } from './ArtEffect'
+import offlinePoster from '../assets/images/Blake.jpg'
 
 export function StreamPlayer({ stream }: { stream: Stream }) {
   const embedUrl = stream.isLive ? toEmbedUrl(stream.url) : null
@@ -25,6 +26,7 @@ export function StreamPlayer({ stream }: { stream: Stream }) {
   return (
     <div className="player is-offline">
       <img src={offlinePoster} alt="" />
+      <ArtEffect kind="slivers" />
       <div className="player-message">
         <p className="player-kicker">{stream.isLive ? 'Live, no player' : 'Off air'}</p>
         <p>{message}</p>

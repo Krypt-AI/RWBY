@@ -9,6 +9,7 @@ import './styles/pages.css'
 import './styles/games.css'
 import './styles/rooms.css'
 import './styles/community.css'
+import './styles/effects.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

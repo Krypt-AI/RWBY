@@ -4,33 +4,31 @@ import type { Category } from '../lib/types'
 import { CATEGORIES, CATEGORY_META, DEFAULT_CATEGORY, SEASONAL_CATEGORY, isCategory } from '../lib/categories'
 import { useSite } from '../hooks/useSite'
 import { useActiveTabInView } from '../hooks/useActiveTabInView'
+import { ArtEffect, type ArtEffectKind } from '../components/ArtEffect'
 import { PageHeader } from '../components/PageHeader'
 import { PollBoard } from '../components/PollBoard'
 import { PollEditor } from '../components/PollEditor'
 import { SeasonCard } from '../components/anime/SeasonCard'
 import { SeasonControls } from '../components/anime/SeasonControls'
-import blakeArt from '../assets/images/Blake.jpg'
-import teamBands from '../assets/images/RWBY2.jpg'
+import teamArt from '../assets/images/RWBY teams.jpg'
 
-interface CategoryArt {
-  image: string
-  /** Picks the band of RWBY2.jpg, or frames a full picture vertically. */
-  positionY: string
-  /** A full picture, cropped to the card, rather than one band of RWBY2.jpg. */
-  isPicture?: boolean
-  label: string
+interface TeamMember {
+  name: string
+  /** Where she stands in RWBY teams.jpg: the x of her centre, in the picture's 576 pixels. */
+  x: number
+  /** Her element, drifting through her light. */
+  effect: ArtEffectKind
 }
 
 /**
- * The art beside each poll. RWBY2.jpg stacks four team bands (Ruby, Weiss, Blake, Yang)
- * vertically, and anime, music and movies each show one. Weiss gets music because she's the
- * team's singer. Games show Blake's own art, framed on her hood and the "B".
+ * The art beside each poll: Team RWBY in a line, with one member lit and the rest of the team
+ * cast in the category's accent (see .lineup-card). Weiss gets music because she's the team's singer.
  */
-const CATEGORY_ART: Record<Category, CategoryArt> = {
-  anime: { image: teamBands, positionY: '0%', label: 'Ruby emblem art' },
-  music: { image: teamBands, positionY: '33.333%', label: 'Weiss emblem art' },
-  game: { image: blakeArt, positionY: '8%', isPicture: true, label: 'Blake art' },
-  movie: { image: teamBands, positionY: '100%', label: 'Yang emblem art' },
+const CATEGORY_MEMBER: Record<Category, TeamMember> = {
+  game: { name: 'Blake', x: 358, effect: 'slivers' },
+  music: { name: 'Weiss', x: 248, effect: 'snow' },
+  anime: { name: 'Ruby', x: 135, effect: 'petals' },
+  movie: { name: 'Yang', x: 475, effect: 'embers' },
 }
 
 export function VotesPage() {
@@ -41,7 +39,7 @@ export function VotesPage() {
   if (!isCategory(category)) return <Navigate to={`/votes/${DEFAULT_CATEGORY}`} replace />
 
   const meta = CATEGORY_META[category]
-  const art = CATEGORY_ART[category]
+  const member = CATEGORY_MEMBER[category]
   const isSeasonal = category === SEASONAL_CATEGORY
 
   return (
@@ -65,11 +63,13 @@ export function VotesPage() {
         <PollBoard category={category} />
         <aside className="votes-side">
           <div
-            className={`band-card accent-${meta.accent}${art.isPicture ? ' is-picture' : ''}`}
-            style={{ '--art': `url(${art.image})`, '--art-y': art.positionY } as CSSProperties}
+            className={`lineup-card accent-${meta.accent}`}
+            style={{ '--art': `url("${teamArt}")`, '--focus-x': member.x } as CSSProperties}
             role="img"
-            aria-label={art.label}
-          />
+            aria-label={`${member.name} with Team RWBY`}
+          >
+            <ArtEffect key={member.effect} kind={member.effect} className="lineup-effect" />
+          </div>
           <p className="votes-blurb">{meta.blurb}</p>
           {isSeasonal && <SeasonCard />}
           {isSeasonal && <SeasonControls />}

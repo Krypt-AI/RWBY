@@ -53,23 +53,32 @@
 }
 
 /*
- * The whole lineup, never cropped: the art takes the hero's height at its own proportions and
- * slides under the copy only until Weiss's panel (27.6% across the image) meets the copy's edge.
- * Narrower heroes scale it down instead. Ruby fades in under the end of the copy, and "lighten"
- * lets the image's black take on the panel colour, so the art has no visible edges.
+ * The whole lineup, never cropped. RWBY3.jpg is 508 × 393, and the picture is the band from
+ * y 88 to 305 between black bars. The art fills the room beside the copy, inset like the copy,
+ * and slides under it only until the middle of Ruby's panel (12.6% across) meets the copy's edge.
+ * Ruby fades in across her panel, staying faint under the copy. The art sits centred: the bars
+ * spill past the hero, the band's top and bottom fade into the panel, and "lighten" lets the
+ * art's black take on the panel colour. At the 1240px page cap the band is under 300px tall, so
+ * it always fits the hero's height.
  */
-.hero-art {
+.hero-art,
+.hero-art-effect {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: auto;
-  height: 100%;
-  max-width: calc((100% - var(--space-7) - var(--hero-copy-width)) / 0.724);
-  object-fit: contain;
-  object-position: right center;
+  inset: 50% var(--space-7) auto auto;
+  width: calc((100% - 2 * var(--space-7) - var(--hero-copy-width)) / 0.874);
+  translate: 0 -50%;
+}
+
+.hero-art {
+  --hero-art-fade:
+    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 12.6%, #000 25.2%),
+    linear-gradient(transparent 22.4%, #000 27%, #000 73%, transparent 77.6%);
+  height: auto;
   mix-blend-mode: lighten;
-  mask-image: linear-gradient(90deg, transparent, #000 28%);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%);
+  mask-image: var(--hero-art-fade);
+  mask-composite: intersect;
+  -webkit-mask-image: var(--hero-art-fade);
+  -webkit-mask-composite: source-in;
 }
 
 .hero-copy {
@@ -101,45 +110,11 @@
   margin-top: var(--space-2);
 }
 
-/* Drifting rose petals: Ruby's signature, kept sparse. */
-.hero-petals {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hero-petals i {
-  position: absolute;
-  top: -20px;
-  width: 11px;
-  height: 8px;
-  background: var(--ruby);
-  border-radius: 80% 0 80% 0;
-  opacity: 0;
-  animation: petal-fall 11s linear infinite;
-}
-
-.hero-petals i:nth-child(1) { left: 48%; animation-delay: 0s; }
-.hero-petals i:nth-child(2) { left: 58%; animation-delay: 2.4s; animation-duration: 13s; }
-.hero-petals i:nth-child(3) { left: 66%; animation-delay: 5s; }
-.hero-petals i:nth-child(4) { left: 74%; animation-delay: 1.2s; animation-duration: 9s; }
-.hero-petals i:nth-child(5) { left: 82%; animation-delay: 6.5s; animation-duration: 12s; }
-.hero-petals i:nth-child(6) { left: 90%; animation-delay: 3.6s; }
-.hero-petals i:nth-child(7) { left: 54%; animation-delay: 8s; animation-duration: 10s; }
-.hero-petals i:nth-child(8) { left: 70%; animation-delay: 9.5s; animation-duration: 14s; }
-.hero-petals i:nth-child(9) { left: 95%; animation-delay: 7.2s; animation-duration: 9.5s; }
-
-@keyframes petal-fall {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.85; }
-  90% { opacity: 0.6; }
-  100% { transform: translate(-140px, 480px) rotate(540deg); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-petals {
-    display: none;
-  }
+/* Dust rises through the band only, one member's colour over each panel; Ruby's stays faint. */
+.hero-art-effect {
+  aspect-ratio: 508 / 217;
+  mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 12.6%, #000 25.2%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 12.6%, #000 25.2%);
 }
 
 /* ---------- Home: now-playing strip ---------- */
@@ -243,17 +218,26 @@
     padding: 0 var(--space-5) var(--space-6);
   }
 
-  /* Stacked: the whole lineup spans the top edge to edge, then settles behind the copy. */
+  /* Stacked: the band (bars cropped off) spans the top edge to edge, then settles behind the copy. */
   .hero-art {
     position: static;
     width: calc(100% + 2 * var(--space-5));
-    max-width: none;
-    height: auto;
+    aspect-ratio: 508 / 217;
     max-height: 300px;
     margin-inline: calc(-1 * var(--space-5));
-    object-position: center;
-    mask-image: linear-gradient(#000 76%, transparent);
-    -webkit-mask-image: linear-gradient(#000 76%, transparent);
+    translate: none;
+    object-fit: cover;
+    mask-image: linear-gradient(#000 70%, transparent);
+    -webkit-mask-image: linear-gradient(#000 70%, transparent);
+  }
+
+  .hero-art-effect {
+    inset: 0 0 auto;
+    width: auto;
+    max-height: 300px;
+    translate: none;
+    mask-image: linear-gradient(#000 70%, transparent);
+    -webkit-mask-image: linear-gradient(#000 70%, transparent);
   }
 }
 
@@ -334,25 +318,82 @@
   gap: var(--space-4);
 }
 
-/* The art beside each poll: by default one quarter (one team band) of RWBY2.jpg. */
-.band-card {
-  aspect-ratio: 416 / 184;
-  background: var(--art) center var(--art-y) / 100% 400% no-repeat;
-  box-shadow: inset 0 0 0 1px var(--line), inset 0 -3px 0 var(--accent);
+/*
+ * The art beside each poll: Team RWBY in a line (RWBY teams.jpg, 576 × 324), with the category's
+ * member lit and the rest of the team cast in its accent. The card frames a 378 × 300 window of
+ * the picture, panned to keep her in view (--focus-x is her centre, in picture pixels). Switching
+ * category pans along the line, and the light and the accent follow.
+ */
+@property --lineup-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+.lineup-card {
+  /* One picture pixel, measured in the card's width. */
+  --px: calc(100cqw / 378);
+  --pan: clamp(0, var(--focus-x) - 189, 198);
+  --art-at: calc(var(--pan) * var(--px) * -1) calc(var(--px) * -24);
+  --art-size: calc(576 * var(--px)) auto;
+  /* The lit band: solid across her, fading out over the next 55 picture pixels on each side. */
+  --light-at: calc((var(--focus-x) - var(--pan) - 110) * var(--px)) 0;
+  --light-size: calc(220 * var(--px)) 100%;
+  --light: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent) var(--light-at) / var(--light-size)
+    no-repeat;
+  --lineup-accent: var(--accent);
+  --pan-motion: 700ms var(--ease-out);
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 378 / 300;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-bottom: 3px solid var(--lineup-accent);
+  background: var(--bg-raised);
+  transition: --lineup-accent var(--pan-motion);
+}
+
+.lineup-card::before,
+.lineup-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transition:
+    background-position var(--pan-motion),
+    mask-position var(--pan-motion),
+    -webkit-mask-position var(--pan-motion);
+}
+
+/* The team, in the accent's hue and dimmed into the panel, settling into it at the edges. */
+.lineup-card::before {
+  background:
+    linear-gradient(0deg, var(--bg-raised) 4%, transparent 40%),
+    linear-gradient(90deg, var(--bg-raised), transparent 16%, transparent 84%, var(--bg-raised)),
+    linear-gradient(color-mix(in srgb, var(--bg-raised) 68%, transparent) 0 0),
+    linear-gradient(var(--lineup-accent) 0 0),
+    var(--art) var(--art-at) / var(--art-size) no-repeat;
+  background-blend-mode: normal, normal, normal, color, normal;
+}
+
+/* The member herself, in her own colours. */
+.lineup-card::after {
+  background:
+    linear-gradient(0deg, var(--bg-raised) 4%, transparent 40%),
+    var(--art) var(--art-at) / var(--art-size) no-repeat;
+  mask: var(--light);
+  -webkit-mask: var(--light);
 }
 
 /*
- * A full picture instead of a band, set into the panel the way page-header art is: it fades
- * in from the sides, settles into the panel at the bottom and picks up the accent's glow.
+ * Her element (components/ArtEffect.tsx) drifts through her light only. It has no entrance of its
+ * own: Chrome stopped painting the particles once an entrance animation on them or on this layer
+ * had finished.
  */
-.band-card.is-picture {
-  background:
-    radial-gradient(24rem 9rem at 0% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
-    linear-gradient(90deg, var(--bg-raised), transparent 34%, transparent 82%, var(--bg-raised)),
-    linear-gradient(0deg, var(--bg-raised), transparent 40%),
-    linear-gradient(color-mix(in srgb, var(--bg-raised) 18%, transparent), color-mix(in srgb, var(--bg-raised) 18%, transparent)),
-    var(--art) center var(--art-y) / cover no-repeat,
-    var(--bg-raised);
+.lineup-effect {
+  z-index: 1;
+  font-size: 0.75rem;
+  mask: var(--light);
+  -webkit-mask: var(--light);
 }
 
 .votes-blurb {
@@ -405,7 +446,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .band-card {
+  .lineup-card {
     display: none;
   }
 }
@@ -516,8 +557,13 @@
   text-align: center;
 }
 
-.not-found img {
+.not-found-art {
   width: min(280px, 70vw);
+}
+
+.not-found-art img {
+  display: block;
+  width: 100%;
   mix-blend-mode: lighten;
 }
 

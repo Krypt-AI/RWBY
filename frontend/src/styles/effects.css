@@ -1,0 +1,260 @@
+/*
+ * Effects over the character art (components/ArtEffect.tsx). Each picture carries its member's
+ * element, sparse and slow so it never pulls focus from the page.
+ *
+ * Every particle gets --x (where it starts across the layer), --phase (how far into its cycle it
+ * starts, so the layer is already in motion on first paint) and --depth (0 far, 1 near: size,
+ * brightness and speed). Sizes are in em, so a layer scales its particles with its font size.
+ * Travel is in container units, so a particle crosses whatever box its layer covers. The layer
+ * fills its picture's box by default; pages place it over their art with their own rules.
+ */
+:where(.art-effect) {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  container-type: size;
+}
+
+.art-effect i {
+  /* Near particles move faster. */
+  --life: calc(var(--cycle) * (1.25 - var(--depth) * 0.5));
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  animation: var(--motion) var(--life) linear calc(var(--phase) * var(--life) * -1) infinite both;
+}
+
+/* ---------- Ruby: rose petals falling (Games, and Ruby's light in the votes card) ---------- */
+/* Her art is red too: light catches one edge of each petal and a soft shadow lifts it off. */
+.art-effect.is-petals i {
+  --cycle: 11s;
+  --motion: petal-fall;
+  top: -1em;
+  width: calc(0.55em + var(--depth) * 0.3em);
+  aspect-ratio: 11 / 8;
+  background: linear-gradient(135deg, #ff9aa8, var(--ruby) 62%);
+  border-radius: 80% 0 80% 0;
+  filter: drop-shadow(0 1px 2px rgb(10 10 13 / 0.6));
+}
+
+@keyframes petal-fall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.85; }
+  90% { opacity: 0.6; }
+  100% { transform: translate(-30cqh, calc(100cqh + 2em)) rotate(540deg); opacity: 0; }
+}
+
+/* ---------- Team RWBY: an Aura roll call (Squad) ---------- */
+/*
+ * Like a party's ready check: every few seconds Ruby, Weiss, Blake and Yang flare with their Aura,
+ * one after another. Each glow sits on its member's panel in RWBY1.jpg (597 × 335), which the
+ * Squad header shows whole, at full height and inset like the copy (.page-header-art.is-on-black).
+ * "screen" only ever adds light, so the silhouettes glow instead of being painted over.
+ */
+.art-effect.is-aura {
+  mix-blend-mode: screen;
+}
+
+.art-effect.is-aura i {
+  /* The picture's width, where its left edge sits in the layer, and the panel's centre across it. */
+  --art-width: calc(100cqh * 597 / 335);
+  --art-left: calc(100cqw - var(--space-6) - var(--art-width));
+  --panel: 0.144;
+  --aura: var(--ruby);
+  top: 0;
+  left: calc(var(--art-left) + var(--panel) * var(--art-width));
+  width: calc(var(--art-width) * 0.3);
+  height: 100%;
+  margin-left: calc(var(--art-width) * -0.15);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--aura) 75%, transparent), transparent);
+  /* Dark until each member's turn first comes round. */
+  opacity: 0;
+  animation: aura-flare 9s ease-in-out infinite;
+}
+
+.art-effect.is-aura i:nth-child(2) { --panel: 0.377; --aura: var(--weiss-ice); animation-delay: 0.35s; }
+.art-effect.is-aura i:nth-child(3) { --panel: 0.618; --aura: var(--blake); animation-delay: 0.7s; }
+.art-effect.is-aura i:nth-child(4) { --panel: 0.854; --aura: var(--yang); animation-delay: 1.05s; }
+
+@keyframes aura-flare {
+  0%, 100% { opacity: 0; }
+  7% { opacity: 0.7; }
+  22% { opacity: 0; }
+}
+
+/* Narrow headers centre the picture above the copy. */
+@media (max-width: 720px) {
+  .art-effect.is-aura i {
+    --art-left: calc((100cqw - var(--art-width)) / 2);
+  }
+}
+
+/* ---------- Weiss: snowfall, with a few crystal flakes among the soft ones (Music) ---------- */
+.art-effect.is-snow i {
+  --cycle: 17s;
+  --motion: snow-fall;
+  top: -1em;
+  width: calc(0.15em + var(--depth) * 0.3em);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--weiss);
+  box-shadow: 0 0 calc(0.2em + var(--depth) * 0.4em) rgb(234 241 251 / 0.8);
+  opacity: calc(0.3 + var(--depth) * 0.6);
+}
+
+.art-effect.is-snow i:nth-child(3n) {
+  width: calc(0.6em + var(--depth) * 0.35em);
+  border-radius: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24'%3E%3Cg stroke='%23eaf1fb' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath id='a' d='M0 0V-10M0-6l-3-3M0-6l3-3'/%3E%3Cuse href='%23a' transform='rotate(60)'/%3E%3Cuse href='%23a' transform='rotate(120)'/%3E%3Cuse href='%23a' transform='rotate(180)'/%3E%3Cuse href='%23a' transform='rotate(240)'/%3E%3Cuse href='%23a' transform='rotate(300)'/%3E%3C/g%3E%3C/svg%3E")
+    center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 3px rgb(159 198 239 / 0.75));
+}
+
+@keyframes snow-fall {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(0.9em, 25cqh) rotate(45deg); }
+  50% { transform: translate(0, 50cqh) rotate(90deg); }
+  75% { transform: translate(-0.9em, 75cqh) rotate(135deg); }
+  100% { transform: translate(0, calc(100cqh + 2em)) rotate(180deg); }
+}
+
+/* ---------- Team RWBY: Dust crystals rising, each member's colour over her panel (Home) ---------- */
+.art-effect.is-dust i {
+  --cycle: 15s;
+  --dust: var(--ruby-strong);
+  bottom: 0;
+  width: calc(1.1em + var(--depth) * 0.7em);
+  aspect-ratio: 1;
+  margin-left: -0.7em;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--dust) 55%, transparent), transparent 75%);
+  animation:
+    dust-rise var(--life) linear calc(var(--phase) * var(--life) * -1) infinite both,
+    dust-twinkle 2.2s ease-in-out calc(var(--phase) * -2.2s) infinite alternate;
+}
+
+.art-effect.is-dust i:nth-child(4n + 2) { --dust: var(--weiss); }
+.art-effect.is-dust i:nth-child(4n + 3) { --dust: var(--blake); }
+.art-effect.is-dust i:nth-child(4n + 4) { --dust: var(--yang); }
+
+/* The crystal's glint: a four-point star at the centre of its glow, white-hot at the core. */
+.art-effect.is-dust i::before {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  background: radial-gradient(closest-side, #fff 20%, var(--dust) 55%);
+  clip-path: polygon(50% 0, 57% 43%, 100% 50%, 57% 57%, 50% 100%, 43% 57%, 0 50%, 43% 43%);
+}
+
+@keyframes dust-rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 0.95; }
+  50% { transform: translate(0.8em, -50cqh); }
+  85% { opacity: 0.7; }
+  100% { transform: translate(-0.4em, calc(-100cqh - 1em)); opacity: 0; }
+}
+
+@keyframes dust-twinkle {
+  from { scale: 0.65; }
+  to { scale: 1.15; }
+}
+
+/* ---------- Blake: the gold slivers of her art, drifting down at its angle (Live) ---------- */
+.art-effect.is-slivers i {
+  --cycle: 8s;
+  --motion: sliver-fall;
+  --glow: calc(0.25 + var(--depth) * 0.5);
+  top: -2em;
+  width: 2px;
+  height: calc(0.7em + var(--depth) * 0.9em);
+  border-radius: 1px;
+  background: linear-gradient(transparent, var(--yang));
+}
+
+/* Tilted like the art's slivers (top to the right), falling along their length. */
+@keyframes sliver-fall {
+  0% { transform: translate(0, 0) rotate(20deg); opacity: 0; }
+  12% { opacity: var(--glow); }
+  85% { opacity: var(--glow); }
+  100% { transform: translate(-36cqh, calc(100cqh + 4em)) rotate(20deg); opacity: 0; }
+}
+
+/* ---------- Yang: embers rising (Yang's light in the votes card) ---------- */
+.art-effect.is-embers i {
+  --cycle: 6s;
+  --motion: ember-rise;
+  bottom: -0.5em;
+  width: calc(0.18em + var(--depth) * 0.2em);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffd36b;
+  box-shadow: 0 0 0.4em 0.1em rgb(255 140 40 / 0.7);
+}
+
+@keyframes ember-rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  35% { transform: translate(0.7em, -35cqh); opacity: 0.6; }
+  50% { opacity: 1; }
+  70% { transform: translate(-0.5em, -70cqh); opacity: 0.8; }
+  100% { transform: translate(0.3em, -100cqh); opacity: 0; }
+}
+
+/* ---------- Ruby under the shattered moon: shards drifting away from it (Control room) ---------- */
+.art-effect.is-shards i {
+  --cycle: 26s;
+  --motion: shard-drift;
+  left: calc(30% + var(--x) * 45%);
+  top: calc(20% + var(--depth) * 50%);
+  width: calc(0.35em + var(--depth) * 0.4em);
+  aspect-ratio: 1;
+  background: #e3ecfb;
+  clip-path: polygon(20% 0, 100% 30%, 70% 100%, 0 65%);
+}
+
+.art-effect.is-shards i:nth-child(even) {
+  clip-path: polygon(0 10%, 85% 0, 100% 80%, 35% 100%);
+}
+
+@keyframes shard-drift {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  20% { opacity: 0.55; }
+  80% { opacity: 0.4; }
+  100% { transform: translate(30cqw, -30cqh) rotate(160deg); opacity: 0; }
+}
+
+/* ---------- Ruby's emblem: a glint running along the scythe (404) ---------- */
+.scythe-glint {
+  position: relative;
+}
+
+/*
+ * A brightened copy of the emblem (--art), seen through a narrow band that sweeps across it.
+ * Its black stays black, and "lighten" keeps that from covering anything, so the light lands
+ * only on the red. The band is a third of the mask's width, so it starts and ends off the art.
+ */
+.scythe-glint::after {
+  --glint: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%) 100% 0 / 300% 100% no-repeat;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--art) center / 100% 100% no-repeat;
+  filter: brightness(2.6) saturate(0.3);
+  mix-blend-mode: lighten;
+  mask: var(--glint);
+  -webkit-mask: var(--glint);
+  animation: scythe-glint 7s var(--ease-out) 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes scythe-glint {
+  0% { mask-position: 100% 0; -webkit-mask-position: 100% 0; }
+  24%, 100% { mask-position: 0 0; -webkit-mask-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-effect,
+  .scythe-glint::after {
+    display: none;
+  }
+}

@@ -13,7 +13,7 @@ export function MusicPage() {
         eyebrow="Music"
         title="Turn it up"
         lead="The squad playlist, everyone’s current favourites and the song of the week."
-        art={{ src: weissArt, position: 'center top' }}
+        art={{ src: weissArt, position: 'center top', effect: 'snow' }}
       />
 
       <div className="split-layout is-wide-main">

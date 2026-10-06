@@ -16,7 +16,7 @@ export function GamesPage() {
         eyebrow="Game guides"
         title="Know the meta"
         lead="Tier lists, lineups, builds and roles for the games we actually queue. MLBB rates update live; every guide is dated to its patch."
-        art={{ src: rubyArt, position: 'center 30%' }}
+        art={{ src: rubyArt, position: 'center 30%', effect: 'petals' }}
         actions={
           <Link to="/squad" className="btn btn-primary">
             <Icon name="users" size={16} /> Find a squad
