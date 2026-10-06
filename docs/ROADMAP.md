@@ -5,16 +5,18 @@ what "done" means and which decisions it needs first.
 
 ## Where things stand (2026-10-06)
 
-- Built and working locally: game guides with live MLBB stats, game rooms with a start-time countdown, each
-  member's role and favourites, and a recommended lineup (counter-aware for MLBB, by map for Valorant), the seasonal
-  anime poll, the squad board, music, the live stream page and votes.
+- Built and working locally: game guides with live MLBB stats and every meta lineup of the patch, game rooms with
+  a start-time countdown, each member's role and favourites, and a recommended lineup (counter-aware for MLBB, by map
+  for Valorant), a solo queue counter-pick board, the seasonal anime poll, the squad board, music, the live stream page
+  and votes.
 - Built: the shared backend (Stage 2). The Supabase schema, security, API functions, realtime and seed live in
   `database/`, with 38 backend tests in `backend/`. The site uses it once `VITE_SUPABASE_URL` and
   `VITE_SUPABASE_PUBLISHABLE_KEY` are set, and runs as the local demo, with data in the browser, without them.
 - Live: [rwby-red.vercel.app](https://rwby-red.vercel.app) deploys every push to `main` and runs on the hosted
-  Supabase project, with Discord sign-in. Migrations through `20261006000900_room_preferences.sql` are applied there.
-  Apply `20261006001000_room_lineup_choice.sql` (`npx supabase db push` in `database/`, never `--include-seed`)
-  before the room lineups reach `main`: that frontend reads `game_rooms.lineup`, and the site can't load without it.
+  Supabase project, with Discord sign-in. Migrations through `20261006001000_room_lineup_choice.sql` are applied
+  there. Still to apply: `20261006001100_seed_without_sample_members.sql`, which takes Weiss and Blake out of the MLBB
+  room (`npx supabase db push` in `database/`, never `--include-seed`). No frontend change depends on it. Apply a
+  migration before pushing any frontend that reads its new columns: the site can't load without them.
 - No frontend unit tests, lint or CI yet.
 
 ## Stage 1: Ship what's built (small)
@@ -77,6 +79,9 @@ is still to do.
 - [x] **4e. Lineups built around the squad:** room members choose a role and up to three favourites. MLBB recommends
   one hero per lane, re-ranked against the enemy draft; Valorant seats the squad in the meta comp for the map the
   room picks.
+- [x] **4f. Solo queue and patch lineups:** a solo queue board in the MLBB room (your lane, favourites and both
+  teams' picks, kept in the browser), and a Lineups tab listing every meta lineup of the patch from pro drafts and
+  ranked data, five players each, filterable by map or source.
 
 ## Stage 5: Polish and launch (small to medium)
 

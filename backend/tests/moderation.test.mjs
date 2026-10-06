@@ -87,9 +87,11 @@ describe('moderator controls', () => {
     const [{ chat }] = await db.admin(`select count(*)::int as chat from public.chat_messages`)
     const [{ posts }] = await db.admin(`select count(*)::int as posts from public.lfg_posts`)
     const [{ profiles }] = await db.admin(`select count(*)::int as profiles from public.profiles`)
+    const [{ members }] = await db.admin(`select count(*)::int as members from public.room_members`)
     assert.equal(chat, 0)
-    // The squad board only lists what members post, so a reset leaves it empty.
+    // The squad board and the game rooms only list real members, so a reset leaves them empty.
     assert.equal(posts, 0)
+    assert.equal(members, 0)
     assert.equal(profiles, 2)
     assert.equal((await settings()).stream_title, 'Friday Squad Night')
 

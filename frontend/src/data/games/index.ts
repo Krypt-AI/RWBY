@@ -1,5 +1,5 @@
 import type { GameId, LfgPost } from '../../lib/types'
-import type { Character, GameGuide, GameSection } from './types'
+import type { Character, GameGuide, GameSection, Lineup } from './types'
 import { MLBB } from './mlbb'
 import { VALORANT } from './valorant'
 
@@ -26,6 +26,11 @@ export function isGameSection(value: string | undefined): value is GameSection {
 /** Human label for a role id, falling back to the id itself. */
 export function roleName(game: GameGuide, roleId: string): string {
   return game.roles.find(role => role.id === roleId)?.name ?? roleId
+}
+
+/** The filter a lineup sits under: its map, or Pro or Ranked for games without maps. */
+export function lineupGroup(lineup: Lineup): string {
+  return lineup.map ?? (lineup.source === 'pro' ? 'Pro' : 'Ranked')
 }
 
 /** Every hero or agent in the game: the draft kit's heroes when there is one, otherwise the tier list. */

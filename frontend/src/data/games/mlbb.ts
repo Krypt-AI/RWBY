@@ -6,6 +6,9 @@ import { MLBB_HEROES } from './mlbbHeroes'
  * Tiers merge mlbb.io and mlbbhub.com; rates are ranked, all servers.
  * Rates are left out where the sources don't publish them. While the live feed
  * (services/liveStats.ts) is up, the page shows live rates instead.
+ * Pro lineups: the 88 MPL ID and MPL PH Season 18 games on 2.2.16 (Liquipedia drafts,
+ * 18 Sep – 3 Oct). Each pair of heroes drafted together in 7+ games, without reusing a hero,
+ * is shown with that pair's most typical winning draft.
  */
 export const MLBB: GameGuide = {
   id: 'mlbb',
@@ -74,11 +77,94 @@ export const MLBB: GameGuide = {
   ],
 
   lineupsIntro:
-    'Squad lineups built from this patch’s strongest pick in each lane. They are starting points for our 5-stacks, not copies of pro drafts.',
+    'Pro lineups come from all 88 games of MPL Indonesia and MPL Philippines Season 18 played on patch 2.2.16 (18 Sep – 3 Oct). No pro team played the same five heroes twice, so each one is built around a pair of heroes that pros keep drafting together. Each pair is shown with a real winning draft. The most-picked heroes by lane were Obsidia in gold (44 drafts), Hirara and Nolan in the jungle (41 each), Zhuxin in mid (32), Minotaur at roam (32), and Barats and Uranus in the EXP lane (17 each). The ranked lineup takes the strongest pick in each lane from the tier list.',
   lineups: [
     {
-      name: 'Sustain brawl',
-      context: 'Teamfight · patch 2.2.16 picks',
+      id: 'pro-obsidia-carmilla',
+      name: 'Obsidia + Carmilla',
+      source: 'pro',
+      context: 'MPL ID & PH Season 18 · patch 2.2.16',
+      record: '11 games · 7–4 · 8 teams',
+      example: 'Dewa United Esports beat RRQ Hoshi in 11:54 · MPL ID Week 6',
+      slots: [
+        { name: 'Aulus', roleId: 'exp' },
+        { name: 'Paquito', roleId: 'jungle' },
+        { name: 'Zhuxin', roleId: 'mid' },
+        { name: 'Obsidia', roleId: 'gold' },
+        { name: 'Carmilla', roleId: 'roam' },
+      ],
+      plan: 'The most-drafted pair of the patch. Carmilla’s ultimate binds grouped enemies together and sets up Obsidia, the most-picked gold laner.',
+    },
+    {
+      id: 'pro-hirara-valentina',
+      name: 'Hirara + Valentina',
+      source: 'pro',
+      context: 'MPL ID & PH Season 18 · patch 2.2.16',
+      record: '10 games · 5–5 · 6 teams',
+      example: 'Ap.Bren beat Onic PH in 12:50 · MPL PH Week 5',
+      slots: [
+        { name: 'Barats', roleId: 'exp' },
+        { name: 'Hirara', roleId: 'jungle' },
+        { name: 'Valentina', roleId: 'mid' },
+        { name: 'Claude', roleId: 'gold' },
+        { name: 'Gatotkaca', roleId: 'roam' },
+      ],
+      plan: 'Hirara locks one target down while Valentina copies the enemy’s best ultimate and turns it on them.',
+    },
+    {
+      id: 'pro-nolan-gloo',
+      name: 'Nolan + Gloo',
+      source: 'pro',
+      context: 'MPL ID & PH Season 18 · patch 2.2.16',
+      record: '8 games · 7–1 · 5 teams',
+      example: 'Aurora PH beat Ap.Bren in 17:45 · MPL PH Week 6',
+      slots: [
+        { name: 'Minotaur', roleId: 'exp' },
+        { name: 'Nolan', roleId: 'jungle' },
+        { name: 'Zhuxin', roleId: 'mid' },
+        { name: 'Obsidia', roleId: 'gold' },
+        { name: 'Gloo', roleId: 'roam' },
+      ],
+      plan: 'The best record of any pro pair this patch. Gloo latches onto a target and soaks the damage while Nolan dashes in to finish it.',
+    },
+    {
+      id: 'pro-paquito-eudora',
+      name: 'Paquito + Eudora',
+      source: 'pro',
+      context: 'MPL ID & PH Season 18 · patch 2.2.16',
+      record: '8 games · 5–3 · 7 teams',
+      example: 'Ap.Bren beat TNC Pro Team in 17:20 · MPL PH Week 5',
+      slots: [
+        { name: 'Esmeralda', roleId: 'exp' },
+        { name: 'Paquito', roleId: 'jungle' },
+        { name: 'Eudora', roleId: 'mid' },
+        { name: 'Obsidia', roleId: 'gold' },
+        { name: 'Minotaur', roleId: 'roam' },
+      ],
+      plan: 'A jungle and mid burst duo: Paquito fights from the first clears, and Eudora’s lightning finishes whoever he engages.',
+    },
+    {
+      id: 'pro-claude-belerick',
+      name: 'Claude + Belerick',
+      source: 'pro',
+      context: 'MPL ID & PH Season 18 · patch 2.2.16',
+      record: '7 games · 5–2 · 4 teams',
+      example: 'Onic PH beat Team Falcons PH in 13:26 · MPL PH Week 6',
+      slots: [
+        { name: 'Barats', roleId: 'exp' },
+        { name: 'Hirara', roleId: 'jungle' },
+        { name: 'Valentina', roleId: 'mid' },
+        { name: 'Claude', roleId: 'gold' },
+        { name: 'Belerick', roleId: 'roam' },
+      ],
+      plan: 'Belerick’s taunt pulls divers off Claude, who scales into the team’s main damage. Claude won 18 of his 25 pro games this patch.',
+    },
+    {
+      id: 'ranked-strongest-per-lane',
+      name: 'Strongest pick per lane',
+      source: 'ranked',
+      context: 'Ranked · patch 2.2.16 tier list',
+      record: 'Top win rate in each lane',
       slots: [
         { name: 'Masha', roleId: 'exp' },
         { name: 'Aulus', roleId: 'jungle' },
@@ -86,31 +172,7 @@ export const MLBB: GameGuide = {
         { name: 'Obsidia', roleId: 'gold' },
         { name: 'Rafaela', roleId: 'roam' },
       ],
-      plan: 'Valir zones the choke, Rafaela speeds the team in and Masha and Aulus heal through the fight. Take Turtle and Lord off won fights instead of chasing kills.',
-    },
-    {
-      name: 'Pick-off',
-      context: 'Skirmish · patch 2.2.16 picks',
-      slots: [
-        { name: 'Argus', roleId: 'exp' },
-        { name: 'Hirara', roleId: 'jungle' },
-        { name: 'Kagura', roleId: 'mid' },
-        { name: 'Bruno', roleId: 'gold' },
-        { name: 'Marcel', roleId: 'roam' },
-      ],
-      plan: 'Hunt isolated targets. Hirara locks one hero down, Marcel freezes the chokepoint and Kagura and Bruno burst the target before help arrives.',
-    },
-    {
-      name: 'Frontline wall',
-      context: 'Late game · patch 2.2.16 picks',
-      slots: [
-        { name: 'Gloo', roleId: 'exp' },
-        { name: 'Lukas', roleId: 'jungle' },
-        { name: 'Gord', roleId: 'mid' },
-        { name: 'Hanabi', roleId: 'gold' },
-        { name: 'Floryn', roleId: 'roam' },
-      ],
-      plan: 'Play safe early and scale. Gloo and Lukas soak damage while Gord pokes from range. Floryn’s global heal turns even fights into wins for Hanabi.',
+      plan: 'Masha, Aulus and Rafaela each win about 59% of ranked games, Valir is the best mid and Obsidia the top marksman. Rafaela speeds the team in while Masha and Aulus heal through the fight.',
     },
   ],
 
@@ -317,6 +379,8 @@ export const MLBB: GameGuide = {
     { label: 'mlbbhub.com tier list', url: 'https://mlbbhub.com/tier-list' },
     { label: 'mlbb.io hero tier', url: 'https://mlbb.io/en/hero-tier' },
     { label: 'mlbbhub.com hero builds', url: 'https://mlbbhub.com/heroes/hirara' },
+    { label: 'MPL ID Season 18 drafts', url: 'https://liquipedia.net/mobilelegends/MPL/Indonesia/Season_18/Regular_Season' },
+    { label: 'MPL PH Season 18 drafts', url: 'https://liquipedia.net/mobilelegends/MPL/Philippines/Season_18/Regular_Season' },
   ],
   liveLinks: [
     { label: 'Official hero rankings', url: 'https://www.mobilelegends.com/rank' },

@@ -359,13 +359,13 @@
  * the picture, panned to keep her in view (--focus-x is her centre, in picture pixels). Switching
  * category pans along the line, and the light and the accent follow.
  */
-@property --lineup-accent {
+@property --poll-art-accent {
   syntax: '<color>';
   inherits: true;
   initial-value: transparent;
 }
 
-.lineup-card {
+.poll-art {
   /* One picture pixel, measured in the card's width. */
   --px: calc(100cqw / 378);
   --pan: clamp(0, var(--focus-x) - 189, 198);
@@ -376,20 +376,20 @@
   --light-size: calc(220 * var(--px)) 100%;
   --light: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent) var(--light-at) / var(--light-size)
     no-repeat;
-  --lineup-accent: var(--accent);
+  --poll-art-accent: var(--accent);
   --pan-motion: 700ms var(--ease-out);
   position: relative;
   container-type: inline-size;
   aspect-ratio: 378 / 300;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-bottom: 3px solid var(--lineup-accent);
+  border-bottom: 3px solid var(--poll-art-accent);
   background: var(--bg-raised);
-  transition: --lineup-accent var(--pan-motion);
+  transition: --poll-art-accent var(--pan-motion);
 }
 
-.lineup-card::before,
-.lineup-card::after {
+.poll-art::before,
+.poll-art::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -400,18 +400,18 @@
 }
 
 /* The team, in the accent's hue and dimmed into the panel, settling into it at the edges. */
-.lineup-card::before {
+.poll-art::before {
   background:
     linear-gradient(0deg, var(--bg-raised) 4%, transparent 40%),
     linear-gradient(90deg, var(--bg-raised), transparent 16%, transparent 84%, var(--bg-raised)),
     linear-gradient(color-mix(in srgb, var(--bg-raised) 68%, transparent) 0 0),
-    linear-gradient(var(--lineup-accent) 0 0),
+    linear-gradient(var(--poll-art-accent) 0 0),
     var(--art) var(--art-at) / var(--art-size) no-repeat;
   background-blend-mode: normal, normal, normal, color, normal;
 }
 
 /* The member herself, in her own colours. */
-.lineup-card::after {
+.poll-art::after {
   background:
     linear-gradient(0deg, var(--bg-raised) 4%, transparent 40%),
     var(--art) var(--art-at) / var(--art-size) no-repeat;
@@ -424,7 +424,7 @@
  * own: Chrome stopped painting the particles once an entrance animation on them or on this layer
  * had finished.
  */
-.lineup-effect {
+.poll-art-effect {
   z-index: 1;
   font-size: 0.75rem;
   mask: var(--light);
@@ -481,7 +481,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .lineup-card {
+  .poll-art {
     display: none;
   }
 }

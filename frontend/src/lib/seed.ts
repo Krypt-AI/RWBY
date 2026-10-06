@@ -1,4 +1,4 @@
-import type { GameRoom, Poll, SiteState, Track } from './types'
+import type { Poll, SiteState, Track } from './types'
 import { CURATED_LINEUPS } from '../data/anime/lineups'
 import { seasonalPollTitle } from './animeSeasons'
 import { createRoom } from './rooms'
@@ -39,16 +39,10 @@ function soon(): string {
   return date.toISOString()
 }
 
-function roomWith(names: string[], startsAt: string | null): GameRoom {
-  const joinedAt = new Date().toISOString()
-  const members = names.map(name => ({ id: `seed-${name}`, name, joinedAt, role: null, picks: [] }))
-  return { ...createRoom(), startsAt, members }
-}
-
 /**
  * Initial content for the local demo: used on first visit and when a moderator resets the site.
  * The shared backend seeds the same content with private.seed_site(), last defined in
- * database/supabase/migrations/…_seed_without_sample_squads.sql.
+ * database/supabase/migrations/…_seed_without_sample_members.sql.
  */
 export function createSeedState(): SiteState {
   return {
@@ -101,7 +95,7 @@ export function createSeedState(): SiteState {
       ],
     },
     rooms: {
-      mlbb: roomWith(['Weiss', 'Blake'], soon()),
+      mlbb: { ...createRoom(), startsAt: soon() },
       valorant: createRoom(),
     },
   }

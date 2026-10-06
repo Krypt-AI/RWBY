@@ -37,14 +37,26 @@ export type TierEntry = {
 
 export type LineupSlot = { name: string; roleId: string }
 
+/** Where a lineup was played: pro matches or ranked games. */
+type LineupSource = 'pro' | 'ranked'
+
+/** A full five-player team, as played on the current patch. */
 export type Lineup = {
+  /** Stable id; a game room stores it as the lineup it settled on. */
+  id: string
   name: string
-  /** Where it's played: a map, a mode or a style. */
+  source: LineupSource
+  /** The map it was played on, for games with maps. */
+  map?: string
+  /** Where the numbers come from, e.g. "VCT Champions 2026". */
   context: string
   slots: LineupSlot[]
+  /** How it plays, in a sentence or two. */
   plan: string
-  /** Optional track record, e.g. "6 maps · 33% won". */
-  record?: string
+  /** Its track record, e.g. "6 maps · 2–4" or "15,996 matches · 51.9% won". */
+  record: string
+  /** Who played it, or a real game it won. */
+  example?: string
 }
 
 export type Loadout = {

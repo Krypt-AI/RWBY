@@ -506,6 +506,66 @@
   border-top: 1px solid var(--line);
 }
 
+.map-lineups-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+}
+
+/* ---------- Squad room or solo queue ---------- */
+.room-modes {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.room-mode-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+/* A solo player's picks: the same rows, ranked. */
+.lane-row.is-ranked {
+  grid-template-columns: 24px 48px minmax(0, 1fr) auto;
+}
+
+.pick-rank {
+  padding-top: var(--space-2);
+  color: var(--text-3);
+  font-family: var(--font-label);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.lane-row.is-ranked:first-child .pick-rank {
+  color: var(--accent);
+}
+
+.pick-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+}
+
+.pick-lanes {
+  color: var(--text-3);
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 520px) {
+  .lane-row.is-ranked {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .lane-row.is-ranked .pick-rank {
+    display: none;
+  }
+}
+
 .threats {
   display: grid;
   gap: var(--space-3);

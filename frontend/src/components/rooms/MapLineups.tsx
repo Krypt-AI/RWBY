@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { GameGuide } from '../../data/games/types'
-import { roleName } from '../../data/games'
+import { lineupGroup, roleName } from '../../data/games'
 import type { GameRoomControls } from '../../hooks/useGameRoom'
 import { bestFit, seatComp, type CompFit, type CompSeat } from '../../lib/lineupPlanner'
 import { ChipGroup } from '../ChipGroup'
@@ -9,18 +9,25 @@ import { Icon } from '../Icon'
 import { HeroPortrait } from '../games/HeroPortrait'
 
 /**
- * The meta comp for each map in the guide, with the squad seated by favourite first, then by role.
- * The chosen map is shared, so everyone in the room sees the same comp and the same seats.
+ * The guide's meta comps by map, with the squad seated by favourite first, then by role. The chosen
+ * comp is shared, so everyone in the room sees the same comp and the same seats.
  */
 export function MapLineups({ game, controls }: { game: GameGuide; controls: GameRoomControls }) {
   const { room, canEdit, setLineup } = controls
   const fits = useMemo(() => game.lineups.map(lineup => seatComp(lineup, room.members)), [game.lineups, room.members])
-  const fit = fits.find(item => item.lineup.name === room.lineup) ?? fits[0]
+  const fit = fits.find(item => item.lineup.id === room.lineup) ?? fits[0]
   if (!fit) return null
 
-  const best = bestFit(fits)
   const { lineup, seats } = fit
-  const mapOptions = fits.map(item => ({ value: item.lineup.name, label: item.lineup.name }))
+  const group = lineupGroup(lineup)
+  const groups = [...new Set(fits.map(item => lineupGroup(item.lineup)))]
+  const inGroup = fits.filter(item => lineupGroup(item.lineup) === group)
+  const best = bestFit(inGroup)
+  /** A map's comps are listed most played first, so picking a map starts there. */
+  const selectGroup = (name: string) => {
+    const first = fits.find(item => lineupGroup(item.lineup) === name)
+    if (first) setLineup(first.lineup.id)
+  }
 
   return (
     <section className="panel map-lineups" aria-labelledby="map-lineups-title">
@@ -30,24 +37,33 @@ export function MapLineups({ game, controls }: { game: GameGuide; controls: Game
         </h2>
       </div>
       <p className="card-note">
-        Pick the map you landed on. Everyone in the room sees the same comp, and your squad takes its slots by
-        favourite {game.characterTerm.one} first, then by role.
+        Pick the map you landed on, then one of the comps pros played there. Everyone in the room sees the same comp,
+        and your squad takes its slots by favourite {game.characterTerm.one} first, then by role.
       </p>
       <ChipGroup
         label="Map"
-        options={mapOptions}
-        isSelected={value => value === lineup.name}
-        onSelect={setLineup}
+        options={groups.map(name => ({ value: name, label: name }))}
+        isSelected={value => value === group}
+        onSelect={selectGroup}
         disabled={!canEdit}
       />
+      {inGroup.length > 1 && (
+        <ChipGroup
+          label={`Comps for ${group}`}
+          options={inGroup.map(item => ({ value: item.lineup.id, label: item.lineup.name }))}
+          isSelected={value => value === lineup.id}
+          onSelect={setLineup}
+          disabled={!canEdit}
+        />
+      )}
       {!canEdit ? (
-        <p className="room-note">Join the room to choose the map.</p>
+        <p className="room-note">Join the room to choose the map and comp.</p>
       ) : (
         best &&
         best !== fit && (
           <p className="muted">
-            Best fit for your squad:{' '}
-            <button type="button" className="link-button" onClick={() => setLineup(best.lineup.name)}>
+            Best fit for your squad here:{' '}
+            <button type="button" className="link-button" onClick={() => setLineup(best.lineup.id)}>
               {best.lineup.name}
             </button>
           </p>
@@ -56,11 +72,11 @@ export function MapLineups({ game, controls }: { game: GameGuide; controls: Game
 
       <div className="comp-head">
         <div>
-          <p className="eyebrow">{lineup.context}</p>
+          <p className="eyebrow">{lineup.map ? `${lineup.map} · ${lineup.context}` : lineup.context}</p>
           <h3 className="panel-title">{lineup.name}</h3>
         </div>
         {best === fit && <span className="tag">Best fit for your squad</span>}
-        {lineup.record && <span className="record">{lineup.record}</span>}
+        <span className="record">{lineup.record}</span>
       </div>
       <ol className="lane-plan">
         {seats.map(seat => (
@@ -68,11 +84,17 @@ export function MapLineups({ game, controls }: { game: GameGuide; controls: Game
         ))}
       </ol>
       <p className="card-note">{lineup.plan}</p>
+      {lineup.example && <p className="fine-print">{lineup.example}</p>}
 
       {room.members.length > 0 && <p className="fine-print">{fitSummary(fit)}</p>}
-      <Link to={`/games/${game.id}/builds`} className="link-arrow">
-        {game.loadoutsTitle} <Icon name="arrow" size={14} />
-      </Link>
+      <div className="map-lineups-links">
+        <Link to={`/games/${game.id}/lineups`} className="link-arrow">
+          All lineups <Icon name="arrow" size={14} />
+        </Link>
+        <Link to={`/games/${game.id}/builds`} className="link-arrow">
+          {game.loadoutsTitle} <Icon name="arrow" size={14} />
+        </Link>
+      </div>
     </section>
   )
 }

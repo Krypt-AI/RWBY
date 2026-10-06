@@ -22,12 +22,17 @@ type SavedRoom = Omit<GameRoom, 'lineup' | 'members'> & {
   members: (Omit<RoomMember, 'role' | 'picks'> & Partial<Pick<RoomMember, 'role' | 'picks'>>)[]
 }
 
-/** Fills in what older saved rooms lack: no chosen lineup, and every member fills with no favourites. */
+/**
+ * Brings saved rooms up to date: drops the sample members earlier starter content seated, and fills
+ * in what older rooms lack (no chosen lineup, and members who fill with no favourites).
+ */
 function withCurrentRooms(state: SiteState): SiteState {
   const upgrade = (room: SavedRoom): GameRoom => ({
     ...room,
     lineup: room.lineup ?? null,
-    members: room.members.map(member => ({ ...member, role: member.role ?? null, picks: member.picks ?? [] })),
+    members: room.members
+      .filter(member => !member.id.startsWith('seed-'))
+      .map(member => ({ ...member, role: member.role ?? null, picks: member.picks ?? [] })),
   })
   const rooms = Object.fromEntries(
     Object.entries(state.rooms).map(([game, room]) => [game, upgrade(room)]),

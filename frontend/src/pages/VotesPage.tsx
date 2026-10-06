@@ -22,7 +22,7 @@ interface LineupMember {
 
 /**
  * The art beside each poll: Team RWBY in a line, with the category's member (its accent, see
- * lib/categories.ts) lit and the rest of the team cast in her colour (see .lineup-card).
+ * lib/categories.ts) lit and the rest of the team cast in her colour (see .poll-art).
  */
 const LINEUP: Record<TeamMember, LineupMember> = {
   ruby: { name: 'Ruby', x: 135, effect: 'petals' },
@@ -63,12 +63,12 @@ export function VotesPage() {
         <PollBoard category={category} />
         <aside className={`votes-side accent-${meta.accent}`}>
           <div
-            className="lineup-card"
+            className="poll-art"
             style={{ '--art': `url("${teamArt}")`, '--focus-x': member.x } as CSSProperties}
             role="img"
             aria-label={`${member.name} with Team RWBY`}
           >
-            <ArtEffect key={member.effect} kind={member.effect} className="lineup-effect" />
+            <ArtEffect key={member.effect} kind={member.effect} className="poll-art-effect" />
           </div>
           <p className="votes-blurb">{meta.blurb}</p>
           {isSeasonal && <SeasonCard />}

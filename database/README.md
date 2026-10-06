@@ -22,6 +22,8 @@ database/supabase/
                               the starter content without sample squad posts (replaces …_seed_content.sql's)
     …_room_preferences.sql    each room member's role and favourite heroes or agents
     …_room_lineup_choice.sql  the lineup a room settles on (a Valorant map's comp), shared by everyone in it
+    …_seed_without_sample_members.sql
+                              the starter content without sample room members (replaces …_seed_without_sample_squads.sql's)
 ```
 
 ## Tables

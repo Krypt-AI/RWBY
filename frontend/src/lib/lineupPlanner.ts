@@ -15,14 +15,25 @@ const OFF_LANE_PENALTY = 0.25
 /** Picks listed under each lane besides the recommended one. */
 const ALTERNATIVE_COUNT = 2
 
+/** Picks a solo player sees for their lane. */
+const SOLO_PICK_COUNT = 5
+
 const ORDINALS = ['top', '2nd', '3rd']
 
 /** 'chose': the member picked this lane. 'filling': they left their lane open, or someone chose theirs first. */
-export type SeatKind = 'chose' | 'filling'
+type SeatKind = 'chose' | 'filling'
 
 type LanePlayer = { member: RoomMember; seat: SeatKind }
 
-export type LanePick = {
+/** Whoever plays a lane: their favourites, and whether this is the lane they chose. */
+type LaneOwner = {
+  picks: string[]
+  /** Whose favourites they are, as the reasons say it: "Ruby’s" or "Your". */
+  possessive: string
+  choseLane: boolean
+}
+
+type LanePick = {
   hero: DraftHero
   score: number
   fit: Fit
@@ -36,6 +47,9 @@ export type LanePick = {
   isComfortPick: boolean
 }
 
+/** Why a player's top favourite isn't their pick. */
+type Benched = { hero: string; why: string }
+
 export type LanePlan = {
   role: GameRole
   player?: LanePlayer
@@ -43,7 +57,7 @@ export type LanePlan = {
   pick?: LanePick
   alternatives: LanePick[]
   /** The player's top favourite when it isn't the pick, and why. */
-  benched?: { hero: string; why: string }
+  benched?: Benched
 }
 
 /** Two members chose the same lane. The first to join keeps it and the other fills. */
@@ -86,6 +100,12 @@ function seatMembers(members: RoomMember[], roles: GameRole[], pool: Map<string,
   return { seats, clashes }
 }
 
+const ownerOf = ({ member, seat }: LanePlayer): LaneOwner => ({
+  picks: member.picks,
+  possessive: `${member.name}’s`,
+  choseLane: seat === 'chose',
+})
+
 /** Comfort picks first, then the higher score; on a tie, favourites in the player's order, then by name. */
 const byStrength = (a: LanePick, b: LanePick) =>
   Number(b.isComfortPick) - Number(a.isComfortPick) ||
@@ -100,30 +120,70 @@ function offLaneReason(hero: DraftHero, role: GameRole, roles: GameRole[]): Reas
   return usual.length > 0 ? { tone: 'bad', text: `Usually a ${usual.join(' or ')} pick` } : undefined
 }
 
+/** Scores one hero for one lane. With no lane (a solo player filling), every hero is on its lane. */
 function lanePick(
   hero: DraftHero,
   rating: HeroRating,
-  role: GameRole,
+  role: GameRole | undefined,
   roles: GameRole[],
-  player?: LanePlayer,
+  owner?: LaneOwner,
 ): LanePick {
-  const rank = player ? player.member.picks.indexOf(hero.name) : -1
+  const rank = owner ? owner.picks.indexOf(hero.name) : -1
   const favouriteRank = rank >= 0 ? rank : undefined
   const fit = fitFor(rating.edge)
-  const isOnLane = hero.lanes.includes(role.id)
-  const isComfortPick = favouriteRank !== undefined && fit !== 'countered' && (isOnLane || player?.seat === 'chose')
+  const isOnLane = !role || hero.lanes.includes(role.id)
+  const isComfortPick = favouriteRank !== undefined && fit !== 'countered' && (isOnLane || owner?.choseLane === true)
 
   // A comfort pick needs no patch form to earn its place; every other hero is weighed on it.
   let score = rating.edge + (isComfortPick ? -favouriteRank * FAVOURITE_STEP : rating.form)
   if (!isOnLane) score -= OFF_LANE_PENALTY
 
   const reasons = [...rating.reasons]
-  if (player && favouriteRank !== undefined) {
-    reasons.unshift({ tone: 'good', text: `${player.member.name}’s ${ORDINALS[favouriteRank]} pick` })
+  if (owner && favouriteRank !== undefined) {
+    reasons.unshift({ tone: 'good', text: `${owner.possessive} ${ORDINALS[favouriteRank]} pick` })
   }
-  const offLane = offLaneReason(hero, role, roles)
+  const offLane = role && offLaneReason(hero, role, roles)
   if (offLane) reasons.push(offLane)
   return { hero, score, fit, reasons, favouriteRank, isComfortPick }
+}
+
+type LaneOptionsInput = {
+  role: GameRole | undefined
+  roles: GameRole[]
+  pool: DraftHero[]
+  ratings: Map<number, HeroRating>
+  /** Heroes nobody can pick: already in either team's draft. */
+  taken: Set<string>
+  owner?: LaneOwner
+}
+
+/** Every candidate for a lane, best first: the heroes played there plus the owner's favourites. */
+function laneOptions({ role, roles, pool, ratings, taken, owner }: LaneOptionsInput): LanePick[] {
+  const fitsLane = (hero: DraftHero) => !role || hero.lanes.includes(role.id) || owner?.picks.includes(hero.name)
+  return pool
+    .filter(hero => !taken.has(hero.name) && fitsLane(hero))
+    .map(hero => lanePick(hero, ratings.get(hero.id)!, role, roles, owner))
+    .sort(byStrength)
+}
+
+/** Why a top favourite that's still available lost its lane to `pick`. */
+function benchedReason(
+  top: string,
+  options: LanePick[],
+  pick: LanePick | undefined,
+  role: GameRole | undefined,
+  roles: GameRole[],
+): Benched | undefined {
+  const option = options.find(candidate => candidate.hero.name === top)
+  if (!option) return undefined
+  if (option.fit === 'countered') {
+    // Enemy matchups are listed before overall form, so the first warning names the counter.
+    const warning = option.reasons.find(reason => reason.tone === 'bad')
+    return { hero: top, why: warning ? `${warning.text}.` : 'An enemy pick counters it.' }
+  }
+  const offLane = role && offLaneReason(option.hero, role, roles)
+  if (!option.isComfortPick && offLane) return { hero: top, why: `${offLane.text}.` }
+  return pick && { hero: top, why: `${pick.hero.name} matches up better with this draft.` }
 }
 
 /**
@@ -140,11 +200,7 @@ export function planLineup({ roles, pool, members, ...context }: LineupInput): L
 
   const options = roles.map(role => {
     const player = seats.get(role.id)
-    const favourites = player?.member.picks ?? []
-    return pool
-      .filter(hero => !enemyNames.has(hero.name) && (hero.lanes.includes(role.id) || favourites.includes(hero.name)))
-      .map(hero => lanePick(hero, ratings.get(hero.id)!, role, roles, player))
-      .sort(byStrength)
+    return laneOptions({ role, roles, pool, ratings, taken: enemyNames, owner: player && ownerOf(player) })
   })
 
   const picks = new Map<number, LanePick>()
@@ -161,7 +217,7 @@ export function planLineup({ roles, pool, members, ...context }: LineupInput): L
   }
 
   /** Why a player's top favourite sits out, or undefined when it's their pick. */
-  const benchedFavourite = (lane: number, player: LanePlayer, pick?: LanePick): LanePlan['benched'] => {
+  const benchedFavourite = (lane: number, player: LanePlayer, pick?: LanePick): Benched | undefined => {
     const top = player.member.picks[0]
     if (!top || top === pick?.hero.name) return undefined
     if (enemyNames.has(top)) return { hero: top, why: 'The enemy has it.' }
@@ -171,16 +227,7 @@ export function planLineup({ roles, pool, members, ...context }: LineupInput): L
       const holder = seats.get(role.id)?.member
       return { hero: top, why: holder ? `${holder.name} plays it in ${role.name}.` : `It’s the ${role.name} pick.` }
     }
-    const option = options[lane]!.find(candidate => candidate.hero.name === top)
-    if (!option) return undefined
-    if (option.fit === 'countered') {
-      // Enemy matchups are listed before overall form, so the first warning names the counter.
-      const warning = option.reasons.find(reason => reason.tone === 'bad')
-      return { hero: top, why: warning ? `${warning.text}.` : 'An enemy pick counters it.' }
-    }
-    const offLane = offLaneReason(option.hero, roles[lane]!, roles)
-    if (!option.isComfortPick && offLane) return { hero: top, why: `${offLane.text}.` }
-    return pick && { hero: top, why: `${pick.hero.name} matches up better with this draft.` }
+    return benchedReason(top, options[lane]!, pick, roles[lane], roles)
   }
 
   const lanes = roles.map((role, lane): LanePlan => {
@@ -197,8 +244,46 @@ export function planLineup({ roles, pool, members, ...context }: LineupInput): L
   return { lanes, clashes }
 }
 
+type SoloInput = DraftContext & {
+  roles: GameRole[]
+  pool: DraftHero[]
+  /** The lane the player is in, or null while they fill. */
+  role: string | null
+  favourites: string[]
+  /** Heroes the player's teammates have locked in. */
+  allies: DraftHero[]
+}
+
+export type SoloPlan = {
+  role?: GameRole
+  /** Best first. */
+  picks: LanePick[]
+  /** The player's top favourite when it isn't the first pick, and why. */
+  benched?: Benched
+}
+
+/** A solo player's best picks for their lane, or for any lane while they fill, against the enemy draft. */
+export function planSolo({ roles, pool, role: roleId, favourites, allies, ...context }: SoloInput): SoloPlan {
+  const role = roles.find(candidate => candidate.id === roleId)
+  const ratings = new Map(pool.map(hero => [hero.id, rateHero(hero, context)]))
+  const enemyNames = new Set(context.enemies.map(enemy => enemy.name))
+  const allyNames = new Set(allies.map(ally => ally.name))
+  const owner: LaneOwner = { picks: favourites, possessive: 'Your', choseLane: role !== undefined }
+  const options = laneOptions({ role, roles, pool, ratings, taken: new Set([...enemyNames, ...allyNames]), owner })
+  const picks = options.slice(0, SOLO_PICK_COUNT)
+
+  const top = favourites[0]
+  let benched: Benched | undefined
+  if (top && top !== picks[0]?.hero.name) {
+    if (enemyNames.has(top)) benched = { hero: top, why: 'The enemy has it.' }
+    else if (allyNames.has(top)) benched = { hero: top, why: 'A teammate has it.' }
+    else benched = benchedReason(top, options, picks[0], role, roles)
+  }
+  return { role, picks, benched }
+}
+
 /** How a squad member got their slot in a comp. */
-export type CompMatch = 'favourite' | 'role' | 'filling'
+type CompMatch = 'favourite' | 'role' | 'filling'
 
 export type CompSeat = { slot: LineupSlot; member?: RoomMember; match?: CompMatch }
 

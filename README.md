@@ -1,9 +1,9 @@
 # RWBY Afterlight
 
-A fan-run, RWBY-themed friends community: game guides with live MLBB stats (MLBB, Valorant), game rooms with
-a start-time countdown and a recommended five-player lineup built around each member's role and favourites
-(counter-aware for MLBB, by map for Valorant), a squad finder, a shared music playlist, a live stream and
-community votes, including a seasonal anime poll.
+A fan-run, RWBY-themed friends community: game guides with live MLBB stats and every meta lineup of the patch
+(MLBB, Valorant), game rooms with a start-time countdown and a recommended five-player lineup built around each
+member's role and favourites (counter-aware for MLBB, by map for Valorant), a solo queue counter-pick board, a squad
+finder, a shared music playlist, a live stream and community votes, including a seasonal anime poll.
 
 ## Project structure
 
@@ -143,9 +143,14 @@ Each lane shows its reasons, a counter rating and two alternatives. The helper a
 healing, dive, magic, physical and crowd-control threats and lists items that answer them. Hero scoring lives in
 `frontend/src/lib/counterPicks.ts`, and seating and the lineup in `frontend/src/lib/lineupPlanner.ts`.
 
-**Valorant: lineups by map.** The room shows the guide's meta comp for each map (`lineups` in the game file). A room
-member picks the map you landed on, and everyone in the room sees the same comp. The squad takes its slots by
-favourite agent first, then by role, then whoever is left fills. The map that suits the squad best is marked.
+**MLBB: solo queue.** Playing without a squad, switch the room to **Solo queue**: your own board with your lane,
+favourites, the enemy's picks and your teammates' picks, kept in this browser (no sign-in, nothing shared). It ranks
+your five best picks with the same scoring, leaves out heroes either team already has, and reads the enemy threats.
+
+**Valorant: lineups by map.** The room lists the guide's pro comps by map (`lineups` in the game file) plus the
+ranked comps. A room member picks the map you landed on and one of its comps, and everyone in the room sees the same
+one. The squad takes its slots by favourite agent first, then by role, then whoever is left fills. The comp that
+suits the squad best on that map is marked.
 
 If the matchup stats can't be reached, counters come from Moonton's official counter relations, bundled in
 `frontend/src/data/games/mlbbHeroes.ts`. Regenerate that snapshot when a patch lands:
@@ -173,6 +178,13 @@ Tier placements, lineups, builds and notes are static, dated snapshots. Each gam
 
 Both were taken on 2026-10-05. When a patch lands, edit the tiers, lineups, builds, equipment and notes, then bump `patch` and `asOf`
 and update `sources`. Leave out any rate the sources don't publish, and the tier list shows a dash.
+
+The lineups are real ones from the current patch, each with its record. MLBB's pro lineups come from the MPL
+Indonesia and Philippines Season 18 drafts on 2.2.16 (Liquipedia). No pro team repeated a full lineup, so each is a
+hero pair drafted together in 7+ games, shown through its most typical winning draft. Valorant's are every comp
+played twice or more on one map at Champions 2026 (vlr.gg), plus the most played and best-winning ranked comps
+(metabot.gg). The Lineups tab lists them all, filterable by map or source. Refresh them with the patch.
+
 To add a game, create a new file with the `GameGuide` shape (`data/games/types.ts`), add its id to `GameId`
 in `lib/types.ts`, give it a room in the seed (`lib/seed.ts`), and register it in `data/games/index.ts`.
 For the shared backend, add a migration that extends the `game_id` type, allows it in `lfg_posts.game`, inserts
@@ -190,14 +202,14 @@ frontend/src/
   pages/             one file per route
   components/        UI building blocks (poll, chat, player, schedule, editors...)
     games/           tier list, live stats bar and leaderboard, lineups, builds, roles, game cards
-    rooms/           game room: lobby, countdown, roster, role and favourites, enemy draft, lineups
+    rooms/           game room: lobby, countdown, roster, role and favourites, drafts, lineups, solo queue
     anime/           seasonal anime poll card and moderator controls
     squad/           LFG card and form
     music/           playlist embed and song queue
   data/games/        game guide snapshots (one file per game) and the MLBB hero snapshot
   data/anime/        curated seasonal lineups
   hooks/             useSite, useMode, useViewer, useAccount, useNotice, usePoll, useLfg, useTracks,
-                     useGameRoom, useLiveStats, useMatchups, useSeasonalPoll, useNow
+                     useGameRoom, useSoloDraft, useLiveStats, useMatchups, useDraftRates, useSeasonalPoll, useNow
   lib/               types, seed data, reducer, context providers, rooms, seasons, counter scoring, lineup planner
   services/backend/  data access: the Supabase backend, or the local demo (see backend/README.md)
   services/          also browser storage, live stats feeds, anime lineup source

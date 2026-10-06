@@ -8,7 +8,7 @@ import { PageHeader } from '../components/PageHeader'
 import { BuildsSection } from '../components/games/BuildsSection'
 import { GameSources } from '../components/games/GameSources'
 import { GameStats } from '../components/games/GameStats'
-import { LineupGrid } from '../components/games/LineupGrid'
+import { LineupList } from '../components/games/LineupList'
 import { LiveLeaderboard } from '../components/games/LiveLeaderboard'
 import { LiveStatsBar } from '../components/games/LiveStatsBar'
 import { MetaNotes } from '../components/games/MetaNotes'
@@ -78,7 +78,7 @@ function GameSectionView({ game, section, live }: { game: GameGuide; section: Ga
         </div>
       )
     case 'lineups':
-      return <LineupGrid game={game} />
+      return <LineupList game={game} />
     case 'builds':
       return <BuildsSection game={game} />
     case 'roles':
