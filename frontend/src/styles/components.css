@@ -136,12 +136,58 @@
   object-position: var(--art-position, center);
 }
 
-/* Art drawn on black is shown whole, inset like the copy, and "lighten" lets its black take on
-   the panel colour, so it has no visible edges. */
-.page-header-art.is-on-black {
-  object-fit: contain;
-  object-position: right var(--space-6) top 50%;
+/*
+ * Art drawn on black can fill the whole header instead (is-fill). "lighten" lets its black take
+ * on the panel colour, so the art has no visible edges; on wide screens it covers the box and the
+ * copy sits over it at the bottom left, on a scrim that settles the art into the panel there.
+ */
+.page-header-art.is-fill,
+.page-header-effect.is-fill {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.page-header-art.is-fill {
   mix-blend-mode: lighten;
+}
+
+@media (min-width: 721px) {
+  .page-header.has-art.is-fill {
+    min-height: 300px;
+  }
+
+  .page-header-art.is-fill,
+  .page-header-effect.is-fill {
+    width: 100%;
+  }
+
+  /*
+   * The scrim follows the copy: it settles the art into the panel under the text and fades out
+   * above and to the right of it, so the silhouettes' heads and the rest of the lineup stay vivid.
+   */
+  .page-header.is-fill .page-header-copy {
+    position: relative;
+  }
+
+  .page-header.is-fill .page-header-copy::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -6rem -14rem calc(-1 * var(--space-6)) calc(-1 * var(--space-6));
+    background: linear-gradient(
+      0deg,
+      var(--bg-raised),
+      color-mix(in srgb, var(--bg-raised) 88%, transparent) calc(100% - 6rem),
+      transparent
+    );
+    mask-image: linear-gradient(90deg, #000 calc(100% - 14rem), transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14rem), transparent);
+    pointer-events: none;
+  }
+
+  .page-header.is-fill .eyebrow {
+    color: var(--text-2);
+  }
 }
 
 .page-header.has-art .page-header-copy {
@@ -187,15 +233,14 @@
     object-position: var(--art-position-narrow, var(--art-position, center));
   }
 
-  /* Whole art fits in the room above the copy (its black needs no fade), so it never runs behind the text. */
-  .page-header-art.is-on-black,
-  .page-header-effect.is-on-black {
+  /* Fill art fits whole in the room above the copy (its black needs no fade), so it never runs behind the text. */
+  .page-header-art.is-fill,
+  .page-header-effect.is-fill {
     height: 164px;
-    mask-image: none;
-    -webkit-mask-image: none;
   }
 
-  .page-header-art.is-on-black {
+  .page-header-art.is-fill {
+    object-fit: contain;
     object-position: center top;
   }
 }

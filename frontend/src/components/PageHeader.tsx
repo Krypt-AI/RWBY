@@ -8,8 +8,11 @@ type PageArt = {
   position?: string
   /** Position on narrow screens, where the art sits above the copy. Defaults to `position`. */
   narrowPosition?: string
-  /** Art drawn on black: shown whole, with its black taking on the panel colour. Ignores the positions. */
-  onBlack?: boolean
+  /**
+   * Art drawn on black that fills the whole header, with the copy over it at the bottom and its
+   * black taking on the panel colour. Narrow screens show it whole above the copy.
+   */
+  fill?: boolean
   /** The member's element drifting over the art. */
   effect?: ArtEffectKind
 }
@@ -25,10 +28,10 @@ type PageHeaderProps = {
 
 export function PageHeader({ eyebrow, title, lead, actions, art }: PageHeaderProps) {
   const artStyle = art && ({ '--art-position': art.position, '--art-position-narrow': art.narrowPosition } as CSSProperties)
-  const artVariant = art?.onBlack ? 'is-on-black' : ''
+  const artVariant = art?.fill ? 'is-fill' : ''
 
   return (
-    <header className={`page-header ${art ? 'has-art' : ''}`}>
+    <header className={`page-header ${art ? 'has-art' : ''} ${artVariant}`}>
       {art && <img className={`page-header-art ${artVariant}`} src={art.src} alt="" style={artStyle} />}
       {art?.effect && <ArtEffect kind={art.effect} className={`page-header-effect ${artVariant}`} />}
       <div className="page-header-copy">

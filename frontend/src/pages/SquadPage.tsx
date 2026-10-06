@@ -34,7 +34,7 @@ export function SquadPage() {
         eyebrow="Looking for group"
         title="Squad up"
         lead="Post what you’re queuing for and which roles you need. Friends tap Join to fill the stack."
-        art={{ src: teamArt, onBlack: true, effect: 'aura' }}
+        art={{ src: teamArt, fill: true, position: 'center 4%', effect: 'aura' }}
       />
 
       <div className="split-layout is-wide-main">

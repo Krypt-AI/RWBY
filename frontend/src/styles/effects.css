@@ -47,9 +47,9 @@
 /* ---------- Team RWBY: an Aura roll call (Squad) ---------- */
 /*
  * Like a party's ready check: every few seconds Ruby, Weiss, Blake and Yang flare with their Aura,
- * one after another. Each glow sits on its member's panel in RWBY1.jpg (597 × 335), which the
- * Squad header shows whole, at full height and inset like the copy (.page-header-art.is-on-black).
- * "screen" only ever adds light, so the silhouettes glow instead of being painted over.
+ * one after another. Each glow sits on its member's panel in RWBY1.jpg (597 × 335), which fills the
+ * Squad header's width (.page-header-art.is-fill). "screen" only ever adds light, so the
+ * silhouettes glow instead of being painted over.
  */
 .art-effect.is-aura {
   mix-blend-mode: screen;
@@ -57,8 +57,8 @@
 
 .art-effect.is-aura i {
   /* The picture's width, where its left edge sits in the layer, and the panel's centre across it. */
-  --art-width: calc(100cqh * 597 / 335);
-  --art-left: calc(100cqw - var(--space-6) - var(--art-width));
+  --art-width: 100cqw;
+  --art-left: 0px;
   --panel: 0.144;
   --aura: var(--ruby);
   top: 0;
@@ -82,9 +82,10 @@
   22% { opacity: 0; }
 }
 
-/* Narrow headers centre the picture above the copy. */
+/* Narrow headers show the picture whole, at the layer's height, centred above the copy. */
 @media (max-width: 720px) {
   .art-effect.is-aura i {
+    --art-width: calc(100cqh * 597 / 335);
     --art-left: calc((100cqw - var(--art-width)) / 2);
   }
 }

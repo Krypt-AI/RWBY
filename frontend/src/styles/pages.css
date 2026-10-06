@@ -39,46 +39,40 @@
 }
 
 /* ---------- Home: hero ---------- */
+/*
+ * RWBY3.jpg is 508 × 393, and the picture is the band from y 88 to 305 between black bars.
+ * Stacked (phones, tablets, narrow windows): the band spans the top edge to edge, bars cropped
+ * off, and settles behind the copy. Wide screens make it a poster (see the media query below).
+ * Throughout, "lighten" lets the art's black take on the panel colour.
+ */
 .hero {
-  --hero-copy-width: 30rem;
   position: relative;
   display: grid;
-  align-items: center;
-  min-height: 440px;
-  padding: var(--space-7);
+  padding: 0 var(--space-5) var(--space-6);
   overflow: hidden;
   background: var(--bg-raised);
   box-shadow: inset 0 0 0 1px var(--line);
   clip-path: polygon(0 0, calc(100% - 32px) 0, 100% 32px, 100% 100%, 0 100%);
 }
 
-/*
- * The whole lineup, never cropped. RWBY3.jpg is 508 × 393, and the picture is the band from
- * y 88 to 305 between black bars. The art fills the room beside the copy, inset like the copy,
- * and slides under it only until the middle of Ruby's panel (12.6% across) meets the copy's edge.
- * Ruby fades in across her panel, staying faint under the copy. The art sits centred: the bars
- * spill past the hero, the band's top and bottom fade into the panel, and "lighten" lets the
- * art's black take on the panel colour. At the 1240px page cap the band is under 300px tall, so
- * it always fits the hero's height.
- */
-.hero-art,
-.hero-art-effect {
-  position: absolute;
-  inset: 50% var(--space-7) auto auto;
-  width: calc((100% - 2 * var(--space-7) - var(--hero-copy-width)) / 0.874);
-  translate: 0 -50%;
+.hero-art {
+  width: calc(100% + 2 * var(--space-5));
+  aspect-ratio: 508 / 217;
+  max-height: 300px;
+  margin-inline: calc(-1 * var(--space-5));
+  object-fit: cover;
+  mix-blend-mode: lighten;
+  mask-image: linear-gradient(#000 70%, transparent);
+  -webkit-mask-image: linear-gradient(#000 70%, transparent);
 }
 
-.hero-art {
-  --hero-art-fade:
-    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 12.6%, #000 25.2%),
-    linear-gradient(transparent 22.4%, #000 27%, #000 73%, transparent 77.6%);
-  height: auto;
-  mix-blend-mode: lighten;
-  mask-image: var(--hero-art-fade);
-  mask-composite: intersect;
-  -webkit-mask-image: var(--hero-art-fade);
-  -webkit-mask-composite: source-in;
+/* Dust rises over the band, one member's colour over each panel. */
+.hero-art-effect {
+  inset: 0 0 auto;
+  aspect-ratio: 508 / 217;
+  max-height: 300px;
+  mask-image: linear-gradient(#000 70%, transparent);
+  -webkit-mask-image: linear-gradient(#000 70%, transparent);
 }
 
 .hero-copy {
@@ -86,7 +80,7 @@
   z-index: 1;
   display: grid;
   gap: var(--space-4);
-  max-width: var(--hero-copy-width);
+  max-width: 32rem;
 }
 
 .hero h1 {
@@ -110,11 +104,89 @@
   margin-top: var(--space-2);
 }
 
-/* Dust rises through the band only, one member's colour over each panel; Ruby's stays faint. */
-.hero-art-effect {
-  aspect-ratio: 508 / 217;
-  mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 12.6%, #000 25.2%);
-  -webkit-mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2) 12.6%, #000 25.2%);
+/*
+ * The poster: the band fills the hero, the team's faces along its top, and the copy anchors the
+ * bottom edge: the title at the left, the lead and actions at the right on the same baseline. The
+ * hero takes the band's proportions (taller when the copy needs it). The image box is the band
+ * plus its bars, so the bars always fall outside the hero, and "cover" trims Ruby's and Yang's
+ * outer edges when the hero runs taller than the band. Below 1200px that trim would reach their
+ * faces, so narrower windows keep the stacked layout.
+ */
+@media (min-width: 1201px) {
+  .hero {
+    aspect-ratio: 508 / 217;
+    min-height: 420px;
+    align-items: end;
+    padding: var(--space-7);
+  }
+
+  .hero-art {
+    position: absolute;
+    top: calc(-100% * 88 / 217);
+    left: 0;
+    width: 100%;
+    height: calc(100% * 393 / 217);
+    max-height: none;
+    margin: 0;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .hero-art-effect {
+    inset: 0;
+    aspect-ratio: auto;
+    max-height: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  /*
+   * The scrim follows the copy: it settles the art into the panel under the text, whatever the
+   * copy's height, and fades out over the 8rem above it, leaving the faces along the top untouched.
+   */
+  .hero-copy::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -8rem calc(-1 * var(--space-7)) calc(-1 * var(--space-7));
+    background: linear-gradient(
+      0deg,
+      var(--bg-raised),
+      color-mix(in srgb, var(--bg-raised) 90%, transparent) calc(100% - 8rem),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .hero-copy {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    grid-template-areas:
+      'eyebrow .'
+      'title lead'
+      'title actions';
+    align-items: end;
+    gap: var(--space-4) var(--space-7);
+    max-width: none;
+  }
+
+  .hero-copy .eyebrow { grid-area: eyebrow; }
+  .hero-copy h1 { grid-area: title; }
+  .hero-copy .lead { grid-area: lead; }
+  .hero-copy .hero-actions { grid-area: actions; }
+
+  /* Over the art, the supporting copy steps up a shade and every line carries a soft shadow. */
+  .hero .eyebrow {
+    color: var(--text-2);
+  }
+
+  .hero .lead {
+    color: var(--text);
+  }
+
+  .hero h1,
+  .hero .lead {
+    text-shadow: 0 2px 24px rgb(10 10 13 / 0.7);
+  }
 }
 
 /* ---------- Home: now-playing strip ---------- */
@@ -210,35 +282,6 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-@media (max-width: 960px) {
-  .hero {
-    min-height: 0;
-    padding: 0 var(--space-5) var(--space-6);
-  }
-
-  /* Stacked: the band (bars cropped off) spans the top edge to edge, then settles behind the copy. */
-  .hero-art {
-    position: static;
-    width: calc(100% + 2 * var(--space-5));
-    aspect-ratio: 508 / 217;
-    max-height: 300px;
-    margin-inline: calc(-1 * var(--space-5));
-    translate: none;
-    object-fit: cover;
-    mask-image: linear-gradient(#000 70%, transparent);
-    -webkit-mask-image: linear-gradient(#000 70%, transparent);
-  }
-
-  .hero-art-effect {
-    inset: 0 0 auto;
-    width: auto;
-    max-height: 300px;
-    translate: none;
-    mask-image: linear-gradient(#000 70%, transparent);
-    -webkit-mask-image: linear-gradient(#000 70%, transparent);
-  }
 }
 
 /* ---------- Live page ---------- */
