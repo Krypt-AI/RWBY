@@ -1,4 +1,4 @@
-import type { GameRoom, LfgPost, Poll, SiteState, Track } from './types'
+import type { GameRoom, Poll, SiteState, Track } from './types'
 import { CURATED_LINEUPS } from '../data/anime/lineups'
 import { seasonalPollTitle } from './animeSeasons'
 import { createRoom } from './rooms'
@@ -25,11 +25,6 @@ function track(title: string, artist: string): Track {
   return { id: createId(), title, artist, url: '', addedBy: 'Team RWBY', likes: 0, at: new Date().toISOString() }
 }
 
-function lfg(post: Omit<LfgPost, 'id' | 'joined' | 'authorId' | 'at'>, hoursAgo: number): LfgPost {
-  const at = new Date(Date.now() - hoursAgo * 3_600_000).toISOString()
-  return { ...post, id: createId(), joined: 0, authorId: 'seed', at }
-}
-
 function daysFromNow(days: number, hour: number): string {
   const date = new Date()
   date.setDate(date.getDate() + days)
@@ -51,7 +46,8 @@ function roomWith(names: string[], startsAt: string | null): GameRoom {
 
 /**
  * Initial content for the local demo: used on first visit and when a moderator resets the site.
- * The shared backend seeds the same content from database/supabase/migrations/…_seed_content.sql.
+ * The shared backend seeds the same content with private.seed_site(), last defined in
+ * database/supabase/migrations/…_seed_without_sample_squads.sql.
  */
 export function createSeedState(): SiteState {
   return {
@@ -93,32 +89,8 @@ export function createSeedState(): SiteState {
         ['Perfect Blue', 'Madhouse · 1997'],
       ]),
     },
-    lfg: [
-      lfg(
-        {
-          game: 'mlbb',
-          mode: 'Ranked',
-          rank: 'Mythic',
-          roles: ['Roam', 'Jungle'],
-          slots: 2,
-          note: 'Pushing to Mythical Glory tonight. Voice on, no tilt.',
-          author: 'Weiss',
-        },
-        1,
-      ),
-      lfg(
-        {
-          game: 'valorant',
-          mode: 'Unrated',
-          rank: 'Any rank',
-          roles: ['Controller'],
-          slots: 1,
-          note: 'Chill games, trying the new Warden. Need someone who smokes.',
-          author: 'Yang',
-        },
-        3,
-      ),
-    ],
+    // The squad board starts empty: it only lists what visitors post.
+    lfg: [],
     music: {
       playlistUrl: '',
       queue: [

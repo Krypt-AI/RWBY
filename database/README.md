@@ -18,6 +18,8 @@ database/supabase/
     …_seed_content.sql        the starter content, also what "Reset everything" restores
     …_api.sql                 the API: one function per site action
     …_realtime.sql            live updates
+    …_seed_without_sample_squads.sql
+                              the starter content without sample squad posts (replaces …_seed_content.sql's)
 ```
 
 ## Tables
@@ -100,8 +102,8 @@ an in-process Postgres.
 Never edit a migration that has been applied. Add a new one (`npx supabase migration new <name>`), then:
 
 - keep `frontend/src/services/backend/shared/rows.ts` (columns and mappers) and `commands.ts` (API calls) in step;
-- if the starter content changes, update both `…_seed_content.sql` and `frontend/src/lib/seed.ts`, which the local
-  demo uses;
+- if the starter content changes, redefine `private.seed_site()` in the new migration (`create or replace`, starting
+  from its latest definition) and update `frontend/src/lib/seed.ts`, which the local demo uses;
 - add or adjust tests in `backend/tests/`.
 
 New tables need `enable row level security`, a read policy, and a line in the realtime publication. The access tests

@@ -73,14 +73,23 @@ describe('moderator controls', () => {
 
   test('resetting the site restores the starter content and keeps accounts', async () => {
     await member.rpc('send_chat_message', { p_id: null, p_text: 'still here?' })
-    await moderator.rpc('clear_lfg')
+    await member.rpc('post_lfg', {
+      p_id: randomUUID(),
+      p_game: 'valorant',
+      p_mode: 'Unrated',
+      p_rank: '',
+      p_roles: [],
+      p_slots: 1,
+      p_note: '',
+    })
     await moderator.rpc('reset_site', { p_time_zone: 'Asia/Kuala_Lumpur' })
 
     const [{ chat }] = await db.admin(`select count(*)::int as chat from public.chat_messages`)
     const [{ posts }] = await db.admin(`select count(*)::int as posts from public.lfg_posts`)
     const [{ profiles }] = await db.admin(`select count(*)::int as profiles from public.profiles`)
     assert.equal(chat, 0)
-    assert.equal(posts, 2)
+    // The squad board only lists what members post, so a reset leaves it empty.
+    assert.equal(posts, 0)
     assert.equal(profiles, 2)
     assert.equal((await settings()).stream_title, 'Friday Squad Night')
 

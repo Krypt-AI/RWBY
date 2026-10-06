@@ -11,9 +11,14 @@ import type { SiteStore, ViewerStore } from './types'
 const SITE_KEY = 'site.v3'
 const VIEWER_KEY = 'viewer.v1'
 
+/** Drops the sample squad posts that earlier starter content saved, keeping the ones visitors wrote. */
+function withoutSampleSquads(state: SiteState): SiteState {
+  return { ...state, lfg: state.lfg.filter(post => post.authorId !== 'seed') }
+}
+
 /** The whole site in this browser's storage, synced between its open tabs. */
 export const localSiteStore: SiteStore = {
-  initialState: () => load(SITE_KEY, createSeedState),
+  initialState: () => withoutSampleSquads(load(SITE_KEY, createSeedState)),
   connect(sync) {
     sync.setStatus('ready')
     return subscribe<SiteState>(SITE_KEY, next => sync.update(() => next))
